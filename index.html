@@ -57,39 +57,77 @@ function draw(t){
    ctx.font='28px Arial';ctx.fillText('✈',x-12,y-12);
  }
 }
-function update(){balEl.textContent=balance.toFixed(0);payoutEl.value=cashed?((bet*m).toFixed(0)):0;betBtn.textContent='BET '+Math.min(1000,Math.max(1,+betEl.value||1))}
+
+function update(){
+ balEl.textContent=balance.toFixed(0);
+ payoutEl.value=cashed?((bet*m).toFixed(0)):0;
+ betBtn.textContent='BET '+Math.min(1000,Math.max(1,+betEl.value||1));
+}
 betEl.oninput=update;
 
 function newRound(){
  running=true;crashed=false;cashed=false;m=1;start=performance.now();
- // Demo randomness only; no real-money or payout logic.
  crashAt=1.15+Math.random()*7.5;
- statusEl.textContent='Flying...';cashBtn.disabled=false;betBtn.disabled=true;
+ statusEl.textContent='Flying...';
+ cashBtn.disabled=false;
+ betBtn.disabled=true;
+
  function frame(t){
-   if(!running)return;
+   if(!running) return;
    const sec=(t-start)/1000;
    m=1+sec*0.42+sec*sec*0.035;
-   if(m>=crashAt){m=crashAt;running=false;crashed=true;cashBtn.disabled=true;statusEl.textContent='💥 CRASHED';addHistory(m);draw(t);multEl.textContent=m.toFixed(2)+'x';return}
-   multEl.textContent=m.toFixed(2)+'x';draw(t);raf=requestAnimationFrame(frame)
+
+   if(m>=crashAt){
+     m=crashAt;
+     running=false;
+     crashed=true;
+     cashBtn.disabled=true;
+     betBtn.disabled=false; // FIX: Resetting Bet Button on Crash
+     statusEl.textContent='💥 CRASHED';
+     addHistory(m);
+     draw(t);
+     multEl.textContent=m.toFixed(2)+'x';
+     return;
+   }
+   multEl.textContent=m.toFixed(2)+'x';
+   draw(t);
+   raf=requestAnimationFrame(frame);
  }
  raf=requestAnimationFrame(frame);
 }
+
 betBtn.onclick=()=>{
- if(running)return;
- bet=Math.floor(+betEl.value||0);if(bet<1||bet>1000){alert('Bet 1 to 1000 virtual coins.');return}
+ if(running) return;
+ bet=Math.floor(+betEl.value||0);
+ if(bet<1||bet>1000){alert('Bet 1 to 1000 virtual coins.');return}
  if(bet>balance){alert('Not enough virtual coins.');return}
- balance-=bet;update();newRound();
+ balance-=bet;
+ update();
+ newRound();
 }
+
 cashBtn.onclick=()=>{
- if(!running||cashed)return;
- cashed=true;running=false;cancelAnimationFrame(raf);cashBtn.disabled=true;
- const win=Math.floor(bet*m);balance+=win;statusEl.textContent='✅ Cashed out at '+m.toFixed(2)+'x';update();addHistory(m);draw(performance.now());
+ if(!running||cashed) return;
+ cashed=true;
+ running=false;
+ cancelAnimationFrame(raf);
+ cashBtn.disabled=true;
+ betBtn.disabled=false; // FIX: Resetting Bet Button on Cashout
+ const win=Math.floor(bet*m);
+ balance+=win;
+ statusEl.textContent='✅ Cashed out at '+m.toFixed(2)+'x';
+ update();
+ addHistory(m);
+ draw(performance.now());
 }
+
 function addHistory(x){
  const d=document.createElement('span');d.className='chip';d.textContent=x.toFixed(2)+'x';hist.prepend(d);
  while(hist.children.length>8)hist.lastChild.remove();
 }
-update();draw(0);
+
+update();
+draw(0);
 </script>
 </body>
 </html>
