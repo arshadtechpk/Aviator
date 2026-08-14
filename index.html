@@ -17,7 +17,7 @@
     </div>
 
     <div class="user-actions">
-      <button class="auth-btn" id="auth-btn" onclick="openAuthModal()">Login / Register</button>
+      <button class="auth-btn" id="auth-btn" onclick="document.getElementById('auth-modal').style.display='flex'">Login / Register</button>
       <div class="wallet-badge" id="wallet-badge" style="display: none;">
         <span class="currency">PKR</span>
         <span class="balance" id="balance">0.00</span>
@@ -25,10 +25,8 @@
     </div>
   </header>
 
-  <!-- Main Game & Dashboard Area -->
+  <!-- Main Game Container -->
   <main class="dashboard-container">
-    
-    <!-- Left Section: Game Screen -->
     <section class="game-section">
       <div class="game-card">
         <div class="game-header">
@@ -51,17 +49,14 @@
       </div>
     </section>
 
-    <!-- Right Section: Deposit & Withdraw Panel -->
+    <!-- Deposit Panel -->
     <section class="wallet-section">
       <div class="wallet-card">
-        
-        <!-- Tabs -->
         <div class="wallet-tabs">
           <button class="tab-btn active" id="btn-tab-deposit" onclick="switchTab('deposit')">Deposit</button>
           <button class="tab-btn" id="btn-tab-withdraw" onclick="switchTab('withdraw')">Withdraw</button>
         </div>
 
-        <!-- Deposit Form -->
         <form id="deposit-form" class="wallet-form" onsubmit="handleDepositSubmit(event)">
           <h3>Deposit Funds</h3>
           <p class="instruction">Send money via EasyPaisa / JazzCash & enter Transaction ID (TID) below.</p>
@@ -92,10 +87,8 @@
           <button type="submit" class="submit-btn">Submit Deposit Request</button>
         </form>
 
-        <!-- Withdraw Form -->
         <form id="withdraw-form" class="wallet-form" style="display: none;" onsubmit="handleWithdrawSubmit(event)">
           <h3>Withdraw Funds</h3>
-          
           <div class="form-group">
             <label>Payment Method</label>
             <select id="wit-method">
@@ -103,36 +96,30 @@
               <option value="jazzcash">JazzCash</option>
             </select>
           </div>
-
           <div class="form-group">
             <label>Account Mobile Number</label>
             <input type="text" id="wit-account" placeholder="03XXXXXXXXX" required>
           </div>
-
           <div class="form-group">
             <label>Amount (PKR)</label>
             <input type="number" id="wit-amount" placeholder="Min 500 PKR" min="500" required>
           </div>
-
           <button type="submit" class="submit-btn withdraw-bg">Request Withdrawal</button>
         </form>
-
       </div>
     </section>
-
   </main>
 
-  <!-- Login / Signup Modal Popup -->
+  <!-- POPUP MODAL (FIXED DIRECT INLINE) -->
   <div class="modal-overlay" id="auth-modal" style="display: none;">
     <div class="modal-card">
-      <button class="close-btn" onclick="closeAuthModal()">✕</button>
+      <button class="close-btn" onclick="document.getElementById('auth-modal').style.display='none'">✕</button>
       
       <div class="modal-tabs">
         <button class="modal-tab active" id="tab-login" onclick="switchAuth('login')">Login</button>
         <button class="modal-tab" id="tab-signup" onclick="switchAuth('signup')">Sign Up</button>
       </div>
 
-      <!-- Login Form -->
       <form id="login-form" onsubmit="handleLogin(event)">
         <div class="form-group">
           <label>Username</label>
@@ -145,7 +132,6 @@
         <button type="submit" class="submit-btn">Login</button>
       </form>
 
-      <!-- Signup Form -->
       <form id="signup-form" style="display: none;" onsubmit="handleSignup(event)">
         <div class="form-group">
           <label>Username</label>
@@ -164,7 +150,6 @@
     </div>
   </div>
 
-  <!-- Supabase Library & Custom Script Loaded at bottom -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
 </body>
