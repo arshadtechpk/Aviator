@@ -32,17 +32,17 @@ button:disabled{opacity:.3;cursor:not-allowed}
 .history h3{margin:0 0 9px;font-size:13px;color:#9ca8bb}.chips{display:flex;gap:7px;flex-wrap:wrap}.chip{background:#263149;padding:6px 10px;border-radius:8px;font-size:12px;color:#38bdf8;font-weight:bold}
 .note{text-align:center;color:#6b7280;font-size:11px;padding:12px}
 
-/* Modal Popup Styles */
+/* Modal Styles */
 .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);justify-content:center;align-items:center;z-index:99}
 .modal-content{background:#1b2333;padding:20px;border-radius:16px;width:90%;max-width:380px;position:relative}
 .close-btn{position:absolute;top:12px;right:15px;font-size:20px;cursor:pointer;color:#9ca8bb}
 .modal-title{margin-top:0;color:#fff;font-size:18px;margin-bottom:15px}
 .form-group{margin-bottom:12px}
-.account-box{background:#0d1320;border:1px dashed #10b981;padding:10px;border-radius:10px;margin-bottom:12px;font-size:13px;color:#cbd5e1}
+.account-box{background:#0d1320;border:1px dashed #10b981;padding:12px;border-radius:10px;margin-bottom:12px;font-size:13px;color:#cbd5e1}
 .account-box strong{color:#ffd54a}
 .btn-submit{width:100%;background:#3b82f6;color:#fff;padding:12px;border-radius:10px;margin-top:10px}
 
-/* Floating Live Chat Button */
+/* Support Button */
 .chat-btn{position:fixed;bottom:15px;right:15px;background:#25d366;color:#fff;border-radius:50px;padding:12px 18px;font-weight:bold;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.4);display:flex;align-items:center;gap:8px;cursor:pointer;z-index:90}
 </style>
 </head>
@@ -55,8 +55,8 @@ button:disabled{opacity:.3;cursor:not-allowed}
 
 <!-- Account Bar -->
 <div class="user-bar">
-  <span id="userStatus" style="font-size:12px; color:#aab4c8;">Logged in as: <b>Guest</b></span>
-  <button class="btn-auth" onclick="openModal('authModal')">🔑 Login / Register</button>
+  <span id="userStatus" style="font-size:12px; color:#f59e0b;">Mode: <b>Guest Demo</b></span>
+  <button class="btn-auth" id="loginHeaderBtn" onclick="openModal('authModal')">🔑 Login / Register</button>
 </div>
 
 <!-- Wallet Actions -->
@@ -73,10 +73,18 @@ button:disabled{opacity:.3;cursor:not-allowed}
 <div class="box"><label>PAYOUT</label><input id="payout" value="0" disabled></div>
 </div>
 <div class="row" style="margin-top:10px"><button class="bet" id="betBtn">BET 10</button><button class="cash" id="cashBtn" disabled>CASH OUT</button></div>
+
+<!-- Referral Box -->
+<div class="box" style="margin-top:10px;" id="refSection">
+  <label>YOUR REFERRAL CODE</label>
+  <input type="text" id="myReferralCode" value="Login to view code" readonly>
+  <button style="width:100%; margin-top:6px; background:#334155; padding:8px; border-radius:8px; font-size:12px; color:#fff;" onclick="copyRef()">📋 Copy Referral Code</button>
+</div>
+
 <div class="history"><h3>Previous rounds</h3><div class="chips" id="history"></div></div>
 </div>
 
-<div class="note">1 PKR = 1 Coin • Instant Easypaisa Deposits & Withdrawals</div>
+<div class="note">1 PKR = 1 Coin • Register and Get 15 Bonus Coins!</div>
 </div>
 
 <!-- Floating Live Chat Button -->
@@ -84,54 +92,62 @@ button:disabled{opacity:.3;cursor:not-allowed}
   💬 Live Support
 </div>
 
-<!-- Auth Modal -->
+<!-- Auth Modal (Register / Login) -->
 <div class="modal" id="authModal">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal('authModal')">&times;</span>
-    <h3 class="modal-title">User Account</h3>
+    <h3 class="modal-title" id="authTitle">Register Account</h3>
     <div class="form-group">
       <label>Mobile Number</label>
       <input type="text" id="usernameInput" placeholder="03001234567">
     </div>
     <div class="form-group">
       <label>Password</label>
-      <input type="password" placeholder="******">
+      <input type="password" id="passwordInput" placeholder="******">
     </div>
-    <button class="btn-submit" onclick="loginUser()">Login / Register</button>
+    <div class="form-group" id="refFieldGroup">
+      <label>Referral Code (Friend's Number - Optional)</label>
+      <input type="text" id="refCodeInput" placeholder="03092255002">
+    </div>
+    <button class="btn-submit" id="authSubmitBtn" onclick="handleAuth()">Register & Get 15 Bonus Coins</button>
+    <p style="text-align:center; margin-top:12px; font-size:12px;">
+      <a href="#" id="authToggleLink" onclick="toggleAuthMode()" style="color:#38bdf8; text-decoration:none;">Already registered? Switch to Login</a>
+    </p>
   </div>
 </div>
 
-<!-- Deposit Modal -->
+<!-- Deposit Modal (Easypaisa Direct Account) -->
 <div class="modal" id="depModal">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal('depModal')">&times;</span>
     <h3 class="modal-title">Deposit Funds</h3>
     
     <div class="form-group">
-      <label>Select Payment Method</label>
+      <label>Payment Method</label>
       <select id="depMethod" onchange="toggleDepMethod()">
-        <option value="Easypaisa">Easypaisa</option>
-        <option value="JazzCash">JazzCash (Coming Soon)</option>
+        <option value="Easypaisa">Easypaisa Account / Scan QR</option>
+        <option value="JazzCash">JazzCash (Till: 980831666)</option>
       </select>
     </div>
 
+    <!-- Easypaisa Details Box -->
     <div class="account-box" id="depAccBox">
-      Payment Method: <strong>Easypaisa</strong><br>
-      Account Number: <strong style="font-size:16px; color:#25d366;">03092255002</strong><br>
-      Title: <strong>Easypaisa Admin Account</strong>
+      Method: <strong style="color:#25d366;">Easypaisa Account</strong><br>
+      Account Title: <strong>MUHAMMAD IRSHAD</strong><br>
+      Account Number: <strong style="font-size:16px; color:#ffd54a;">03092255002</strong>
     </div>
 
-    <div style="font-size:11px; color:#10b981; margin-bottom:10px;">🎁 Offer: 1000 PKR deposit par 1020 coins (2% bonus)</div>
+    <div style="font-size:11px; color:#10b981; margin-bottom:10px;">🎁 Bonus Offer: Rs.1000 deposit par aapko aur referrer ko Rs.20 bonus!</div>
     
     <div class="form-group">
       <label>Deposit Amount (PKR)</label>
       <input type="number" id="depAmount" value="1000">
     </div>
     <div class="form-group">
-      <label>TID / Transaction ID</label>
+      <label>Transaction ID (TID)</label>
       <input type="text" id="depTID" placeholder="Enter Transaction ID">
     </div>
-    <button class="btn-submit" style="background:#10b981;" id="depSubmitBtn" onclick="processDeposit()">Submit Request</button>
+    <button class="btn-submit" style="background:#10b981;" id="depSubmitBtn" onclick="processDeposit()">Submit Deposit Request</button>
   </div>
 </div>
 
@@ -142,9 +158,9 @@ button:disabled{opacity:.3;cursor:not-allowed}
     <h3 class="modal-title">Withdraw Funds</h3>
     <div class="form-group">
       <label>Method</label>
-      <select id="withMethod" onchange="toggleWithMethod()">
+      <select id="withMethod">
         <option value="Easypaisa">Easypaisa</option>
-        <option value="JazzCash">JazzCash (Coming Soon)</option>
+        <option value="JazzCash">JazzCash</option>
       </select>
     </div>
     <div class="form-group">
@@ -153,25 +169,25 @@ button:disabled{opacity:.3;cursor:not-allowed}
     </div>
     <div class="form-group">
       <label>Account Number</label>
-      <input type="text" id="withNum" placeholder="03092255002">
+      <input type="text" id="withNum" placeholder="03001234567">
     </div>
     <div class="form-group">
       <label>Account Title</label>
-      <input type="text" id="withTitle" placeholder="Account Name">
+      <input type="text" id="withTitle" placeholder="Account Holder Name">
     </div>
-    <button class="btn-submit" style="background:#ef4444;" id="withSubmitBtn" onclick="processWithdraw()">Submit Request</button>
+    <button class="btn-submit" style="background:#ef4444;" id="withSubmitBtn" onclick="processWithdraw()">Submit Withdrawal Request</button>
   </div>
 </div>
 
-<!-- Live Chat Modal -->
+<!-- Support Modal -->
 <div class="modal" id="chatModal">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal('chatModal')">&times;</span>
     <h3 class="modal-title">💬 Live Support</h3>
-    <p style="font-size:13px; color:#cbd5e1;">Deposit, withdrawal ya kisi bhi maslay ke liye admin se rabta karein:</p>
+    <p style="font-size:13px; color:#cbd5e1;">Deposit, withdrawal ya kisi bhi maslay ke liye WhatsApp par rabta karein:</p>
     <a href="https://wa.me/923092255002" target="_blank" style="text-decoration:none;">
       <button class="btn-submit" style="background:#25d366; display:flex; align-items:center; justify-content:center; gap:8px;">
-        📱 Contact Admin on WhatsApp
+        📱 Contact MUHAMMAD IRSHAD on WhatsApp
       </button>
     </a>
   </div>
@@ -182,14 +198,17 @@ const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
 const multEl=document.getElementById('mult'),statusEl=document.getElementById('status');
 const balEl=document.getElementById('balance'),betEl=document.getElementById('bet'),payoutEl=document.getElementById('payout');
 const betBtn=document.getElementById('betBtn'),cashBtn=document.getElementById('cashBtn'),hist=document.getElementById('history');
+
 let balance=10000, bet=10, running=false, crashed=false, cashed=false, m=1, crashAt=0, start=0, raf;
+let isRealUser = false;
+let currentUser = null;
+let isRegisterMode = true;
 
 function resize(){canvas.width=canvas.clientWidth*devicePixelRatio;canvas.height=canvas.clientHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
 addEventListener('resize',resize); resize();
 
 function draw(t){
  const w=canvas.clientWidth,h=canvas.clientHeight;ctx.clearRect(0,0,w,h);
- 
  ctx.strokeStyle='#1e293b';ctx.lineWidth=1;ctx.fillStyle='#475569';ctx.font='10px Arial';
  const step=w/6;
  for(let i=1;i<=6;i++){
@@ -203,7 +222,6 @@ function draw(t){
    const p=Math.min(1,(t-start)/6000), x=20+p*(w-50), y=h-30-p*(h-70);
    ctx.fillStyle='rgba(239, 68, 68, 0.18)';
    ctx.beginPath();ctx.moveTo(20, h-30);ctx.quadraticCurveTo(w*0.4, h*0.8, x, y);ctx.lineTo(x, h-30);ctx.closePath();ctx.fill();
-
    ctx.strokeStyle='#ef4444';ctx.lineWidth=4;
    ctx.beginPath();ctx.moveTo(20,h-30);ctx.quadraticCurveTo(w*0.4,h*0.8,x,y);ctx.stroke();
    
@@ -219,12 +237,26 @@ function update(){
  balEl.textContent=balance.toFixed(0);
  payoutEl.value=cashed?((bet*m).toFixed(0)):0;
  betBtn.textContent='BET '+Math.min(5000,Math.max(1,+betEl.value||1));
+ 
+ if(isRealUser && currentUser) {
+   let uData = JSON.parse(localStorage.getItem(currentUser));
+   if(uData){
+     uData.realBalance = balance;
+     localStorage.setItem(currentUser, JSON.stringify(uData));
+   }
+ }
 }
 betEl.oninput=update;
 
 function newRound(){
  running=true;crashed=false;cashed=false;m=1;start=performance.now();
- crashAt=1.15+Math.random()*8.0;
+ 
+ if (!isRealUser) {
+   crashAt = 10.0 + Math.random() * 40.0; // High multipliers on demo mode
+ } else {
+   crashAt = 1.05 + Math.random() * 4.5; // Realistic fair crash on real mode
+ }
+
  statusEl.textContent='Flying...';statusEl.style.color='#aab4c8';
  cashBtn.disabled=false;betBtn.disabled=true;
 
@@ -270,30 +302,84 @@ function addHistory(x){
 function openModal(id){document.getElementById(id).style.display='flex'}
 function closeModal(id){document.getElementById(id).style.display='none'}
 
+function toggleAuthMode(){
+  isRegisterMode = !isRegisterMode;
+  const title = document.getElementById('authTitle');
+  const btn = document.getElementById('authSubmitBtn');
+  const link = document.getElementById('authToggleLink');
+  const refGrp = document.getElementById('refFieldGroup');
+
+  if(isRegisterMode){
+    title.innerText = 'Register Account';
+    btn.innerText = 'Register & Get 15 Bonus Coins';
+    link.innerText = 'Already registered? Switch to Login';
+    refGrp.style.display = 'block';
+  } else {
+    title.innerText = 'Login Account';
+    btn.innerText = 'Login to Real Account';
+    link.innerText = "Don't have an account? Register Now";
+    refGrp.style.display = 'none';
+  }
+}
+
+function handleAuth(){
+  const user = document.getElementById('usernameInput').value.trim();
+  const pass = document.getElementById('passwordInput').value.trim();
+  const refCode = document.getElementById('refCodeInput').value.trim();
+
+  if(!user || !pass){ alert('Please fill in Mobile Number and Password.'); return; }
+
+  if(isRegisterMode){
+    if(localStorage.getItem(user)){
+      alert('This mobile number is already registered! Switch to Login.');
+      toggleAuthMode();
+    } else {
+      const userData = { password: pass, realBalance: 15, referrer: refCode || null, hasDeposited: false };
+      localStorage.setItem(user, JSON.stringify(userData));
+      alert('🎉 Registration Successful! 15 Gift Coins added.');
+      
+      currentUser = user;
+      isRealUser = true;
+      balance = 15;
+      document.getElementById('userStatus').innerHTML = `Real User: <b>${user}</b>`;
+      document.getElementById('loginHeaderBtn').style.display = 'none';
+      document.getElementById('myReferralCode').value = user;
+      update();
+      closeModal('authModal');
+    }
+  } else {
+    const saved = localStorage.getItem(user);
+    if(!saved){
+      alert('No account found! Please Register first.');
+      return;
+    }
+    const userData = JSON.parse(saved);
+    if(userData.password === pass){
+      currentUser = user;
+      isRealUser = true;
+      balance = userData.realBalance;
+      document.getElementById('userStatus').innerHTML = `Real User: <b>${user}</b>`;
+      document.getElementById('loginHeaderBtn').style.display = 'none';
+      document.getElementById('myReferralCode').value = user;
+      alert('✅ Login Successful!');
+      update();
+      closeModal('authModal');
+    } else {
+      alert('❌ Incorrect Password!');
+    }
+  }
+}
+
 function toggleDepMethod(){
  const method = document.getElementById('depMethod').value;
  const box = document.getElementById('depAccBox');
- const btn = document.getElementById('depSubmitBtn');
  
  if(method === 'JazzCash'){
    box.style.borderColor = '#f59e0b';
-   box.innerHTML = `<span style="color:#f59e0b; font-weight:bold;">⏳ JazzCash Service Coming Soon!</span><br><span style="font-size:11px;">Please use Easypaisa for instant deposits.</span>`;
-   btn.disabled = true;
+   box.innerHTML = `Method: <strong style="color:#f59e0b;">JazzCash Till ID</strong><br>Shop Name: <strong>Arshad Mobile Shop RYK</strong><br>Till ID: <strong style="font-size:16px; color:#ffd54a;">980831666</strong>`;
  } else {
    box.style.borderColor = '#10b981';
-   box.innerHTML = `Payment Method: <strong>Easypaisa</strong><br>Account Number: <strong style="font-size:16px; color:#25d366;">03092255002</strong><br>Title: <strong>Easypaisa Admin Account</strong>`;
-   btn.disabled = false;
- }
-}
-
-function toggleWithMethod(){
- const method = document.getElementById('withMethod').value;
- const btn = document.getElementById('withSubmitBtn');
- if(method === 'JazzCash'){
-   alert('JazzCash is coming soon! Please select Easypaisa.');
-   btn.disabled = true;
- } else {
-   btn.disabled = false;
+   box.innerHTML = `Method: <strong style="color:#25d366;">Easypaisa Account</strong><br>Account Title: <strong>MUHAMMAD IRSHAD</strong><br>Account Number: <strong style="font-size:16px; color:#ffd54a;">03092255002</strong>`;
  }
 }
 
@@ -304,7 +390,28 @@ function processDeposit(){
  if(amt <= 0){ alert('Enter a valid deposit amount'); return; }
  if(!tid){ alert('Please enter Transaction ID (TID)'); return; }
  
- alert(`✅ Deposit Request Submitted!\n\nAmount: PKR ${amt}\nTID: ${tid}\n\nYour request is being processed. Coins will be credited after verification.`);
+ if(isRealUser && currentUser){
+   let userData = JSON.parse(localStorage.getItem(currentUser));
+   
+   // Referral Bonus Check
+   if(amt >= 1000 && !userData.hasDeposited){
+     balance += 20;
+     userData.hasDeposited = true;
+     
+     if(userData.referrer && localStorage.getItem(userData.referrer)){
+       let refData = JSON.parse(localStorage.getItem(userData.referrer));
+       refData.realBalance += 20;
+       localStorage.setItem(userData.referrer, JSON.stringify(refData));
+       alert('🎁 Rs.20 Referral Bonus credited to you and your referrer!');
+     }
+   }
+   
+   userData.realBalance = balance;
+   localStorage.setItem(currentUser, JSON.stringify(userData));
+   update();
+ }
+
+ alert(`✅ Deposit Request Submitted!\n\nAmount: PKR ${amt}\nTID: ${tid}\n\nYour deposit is submitted. Admin will verify and credit your coins.`);
  closeModal('depModal');
 }
 
@@ -313,21 +420,21 @@ function processWithdraw(){
  const num = document.getElementById('withNum').value;
  const title = document.getElementById('withTitle').value;
  
+ if(!isRealUser){ alert('Please Login / Register first to withdraw.'); return; }
  if(amt <= 0 || amt > balance){ alert('Insufficient balance or invalid amount'); return; }
  if(!num || !title){ alert('Please fill account details'); return; }
  
  balance -= amt;
  update();
- alert(`✅ Withdrawal Request Submitted!\n\nAmount: ${amt} coins\nEasypaisa: ${num}\nTitle: ${title}\n\nYour withdrawal will be processed shortly.`);
+ alert(`✅ Withdrawal Request Submitted!\n\nAmount: ${amt} coins\nNumber: ${num}\nTitle: ${title}\n\nYour withdrawal will be processed shortly.`);
  closeModal('withModal');
 }
 
-function loginUser(){
- const user = document.getElementById('usernameInput').value;
- if(!user){ alert('Please enter your mobile number'); return; }
- document.getElementById('userStatus').innerHTML = `Logged in as: <b>${user}</b>`;
- alert('Logged in successfully!');
- closeModal('authModal');
+function copyRef(){
+ const code = document.getElementById('myReferralCode').value;
+ if(!isRealUser){ alert('Please Register / Login to view your Referral Code'); return; }
+ navigator.clipboard.writeText(code);
+ alert('📋 Referral Code Copied: ' + code + '\nShare it with your friends!');
 }
 
 update();draw(0);
