@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aviator Admin Panel</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { background: #0b0e14; color: #fff; font-family: sans-serif; padding: 20px; }
+    h1 { color: #00e676; text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #151a23; }
+    th, td { border: 1px solid #21262d; padding: 12px; text-align: center; }
+    th { background: #0d1117; color: #00e676; }
+    .btn-approve { background: #00e676; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; color: #000; }
+    .status-pending { color: #ffb300; font-weight: bold; }
+    .status-approved { color: #00e676; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h1>AVIATOR ADMIN PANEL</h1>
+  <h3>All User Deposits</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Amount (PKR)</th>
+        <th>Method</th>
+        <th>TID</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="deposit-list">
+      <!-- Dynamic Data -->
+    </tbody>
+  </table>
+
+  <script>
+    const SUPABASE_URL = 'https://twhgyqzidkclntfbcadw.supabase.co';
+    const SUPABASE_KEY = 'Sb_publishable_PQEgFp8leGVzvbD16SjmQQ_EVWtIc6R';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function fetchDeposits() {
+      const { data, error } = await supabase.from('deposits').select('*').order('created_at', { ascending: false });
+      const tableBody = document.getElementById('deposit-list');
+      tableBody.innerHTML = '';
+
+      if (data) {
+        data.forEach(dep => {
+          tableBody.innerHTML += `
+            <tr>
+              <td>${dep.username}</td>
+              <td>${dep.amount} PKR</td>
+              <td>${dep.payment_method.toUpperCase()}</td>
+              <td>${dep.tid}</td>
+              <td class="status-${dep.status}">${dep.status.toUpperCase()}</td>
+              <td>
+                ${dep.status === 'pending' ? `<button class="btn-approve" onclick="approveDeposit('${dep.id}', '${dep.username}', ${dep.amount})">Approve & Add Balance</button>` : 'Completed'}
+              </td>
+            </tr>
+          `;
+        });
+      }
+    }
+
+    async function approveDeposit(id, username, amount) {
+      await supabase.from('deposits').update({ status: 'approved' }).eq('id', id);
+
+      const { data: user } = await supabase.from('users').select('balance').eq('username', username).single();
+      if (user) {
+        const newBalance = Number(user.balance) + Number(amount);
+        await supabase.from('users').update({ balance: newBalance }).eq('username', username);
+        alert('Deposit Approved & Balance Added to User Wallet!');
+        fetchDeposits();
+      } else {
+        alert('Deposit Status Approved!');
+        fetchDeposits();
+      }
+    }
+
+    fetchDeposits();
+  </script>
+</body>
+</html>
