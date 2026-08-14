@@ -11,17 +11,59 @@
 
   <div class="app-card">
     
-    <!-- Header Section -->
+    <!-- Header Section with Logo & Login Button -->
     <header class="navbar">
       <div class="brand">
         <span class="plane-icon">✈️</span>
         <span class="logo-text">AVIATOR <small>PRO</small></span>
       </div>
-      <div class="wallet-badge">
-        <span class="currency-label">PKR</span>
-        <span class="balance" id="balance">1,066.00</span>
+      
+      <div class="header-right">
+        <button type="button" class="btn-login-toggle" id="auth-btn" onclick="toggleAuthForm()">Login / Signup</button>
+        <div class="wallet-badge" id="wallet-badge" style="display: none;">
+          <span class="currency-label">PKR</span>
+          <span class="balance" id="balance">1,066.00</span>
+        </div>
       </div>
     </header>
+
+    <!-- Login / Signup Collapsible Box -->
+    <div class="auth-box" id="auth-box">
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" id="tab-login" onclick="switchAuth('login')">Login</button>
+        <button type="button" class="auth-tab" id="tab-signup" onclick="switchAuth('signup')">Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="pro-form" onsubmit="handleAuth(event)">
+        <div class="form-group">
+          <label>USERNAME / PHONE</label>
+          <input type="text" placeholder="Enter username or 03XX..." required>
+        </div>
+        <div class="form-group">
+          <label>PASSWORD</label>
+          <input type="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-action btn-deposit">LOGIN</button>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form id="signup-form" class="pro-form" style="display: none;" onsubmit="handleAuth(event)">
+        <div class="form-group">
+          <label>USERNAME</label>
+          <input type="text" placeholder="Choose username" required>
+        </div>
+        <div class="form-group">
+          <label>PHONE NUMBER</label>
+          <input type="text" placeholder="03XXXXXXXXX" required>
+        </div>
+        <div class="form-group">
+          <label>PASSWORD</label>
+          <input type="password" placeholder="Create password" required>
+        </div>
+        <button type="submit" class="btn-action btn-deposit">CREATE ACCOUNT</button>
+      </form>
+    </div>
 
     <!-- Game Screen / Multiplier Area -->
     <div class="game-viewport">
@@ -81,7 +123,7 @@
         <button type="submit" class="btn-action btn-deposit">SUBMIT DEPOSIT</button>
       </form>
 
-      <!-- Withdraw Form (Initially Hidden) -->
+      <!-- Withdraw Form -->
       <form id="withdraw-form" class="pro-form" style="display: none;">
         <div class="form-group">
           <label>USER NAME / ID</label>
