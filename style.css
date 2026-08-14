@@ -41,7 +41,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .brand {
@@ -60,6 +60,23 @@ body {
   border-radius: 4px;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.btn-login-toggle {
+  background: var(--accent-green);
+  color: #000;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--accent-green-glow);
+}
+
 .wallet-badge {
   background: rgba(0, 230, 118, 0.08);
   border: 1px solid var(--accent-green);
@@ -75,6 +92,40 @@ body {
   font-size: 0.75rem;
   opacity: 0.8;
   margin-right: 4px;
+}
+
+/* Auth Box Styling */
+.auth-box {
+  background: rgba(13, 17, 23, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  display: block; /* By default shown */
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+.auth-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.auth-tab.active {
+  color: var(--accent-green);
+  border-bottom: 2px solid var(--accent-green);
 }
 
 .game-viewport {
@@ -244,4 +295,4 @@ body {
 .btn-withdraw {
   background: var(--accent-red);
   color: #fff;
-  }
+}
