@@ -5,39 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aviator Game & Portal</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #0b0e14; color: #fff; padding: 10px; display: flex; justify-content: center; }
-        .main-container { width: 100%; max-width: 480px; background: #151a23; border-radius: 12px; padding: 15px; border: 1px solid #242b35; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b0e14; color: #fff; padding: 12px; display: flex; justify-content: center; }
+        .main-container { width: 100%; max-width: 450px; background: #151a23; border-radius: 12px; padding: 16px; border: 1px solid #242b35; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
         
-        /* Top Navigation */
-        .header { display: flex; justify-content: space-between; align-items: center; background: #1e2530; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; }
-        .balance-box { font-size: 16px; font-weight: bold; color: #00e676; }
+        /* Top Navigation Header */
+        .header { display: flex; justify-content: space-between; align-items: center; background: #1e2530; padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; }
+        .logo { font-size: 18px; font-weight: bold; color: #ff1744; letter-spacing: 1px; }
+        .balance-box { font-size: 15px; font-weight: bold; color: #00e676; background: #0b0e14; padding: 6px 12px; border-radius: 20px; border: 1px solid #242b35; }
         
-        /* Game Screen */
-        .game-screen { position: relative; width: 100%; height: 220px; background: radial-gradient(circle, #1a2230 0%, #0b0e14 100%); border-radius: 10px; border: 1px solid #242b35; overflow: hidden; display: flex; justify-content: center; align-items: center; margin-bottom: 15px; }
-        .multiplier { font-size: 42px; font-weight: bold; color: #fff; z-index: 2; }
-        .plane { position: absolute; bottom: 20px; left: 20px; font-size: 32px; transition: transform 0.1s linear; display: none; }
-        .crashed-text { color: #ff1744; font-size: 20px; font-weight: bold; position: absolute; bottom: 30px; display: none; }
+        /* Game Screen Canvas */
+        .game-screen { position: relative; width: 100%; height: 210px; background: radial-gradient(circle, #1a2230 0%, #0b0e14 100%); border-radius: 10px; border: 1px solid #242b35; overflow: hidden; display: flex; justify-content: center; align-items: center; margin-bottom: 15px; }
+        .multiplier { font-size: 44px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+        .plane { position: absolute; bottom: 20px; left: 20px; font-size: 36px; transition: transform 0.1s linear; display: none; z-index: 1; }
+        .crashed-text { color: #ff1744; font-size: 22px; font-weight: bold; position: absolute; bottom: 30px; display: none; }
         
         /* Betting Section */
-        .bet-section { display: flex; gap: 10px; margin-bottom: 15px; }
-        .bet-input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #242b35; background: #0b0e14; color: #fff; font-size: 16px; text-align: center; }
-        .action-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .bet-section { display: flex; gap: 10px; margin-bottom: 20px; }
+        .bet-input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #242b35; background: #0b0e14; color: #fff; font-size: 16px; text-align: center; font-weight: bold; }
+        .action-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
         .btn-bet { background: #00e676; color: #000; }
         .btn-cashout { background: #ffb300; color: #000; display: none; }
 
-        /* Banking Tabs & Form */
-        .tabs { display: flex; gap: 10px; margin-bottom: 10px; border-top: 1px solid #242b35; padding-top: 15px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 6px; background: #1e2530; color: #90a4ae; font-weight: bold; cursor: pointer; }
+        /* Banking / Management Section */
+        .portal-title { text-align: center; color: #00e676; font-size: 18px; margin-bottom: 12px; font-weight: bold; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; border-top: 1px solid #242b35; padding-top: 15px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 6px; background: #1e2530; color: #90a4ae; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .tab-btn.active-dep { background: #00e676; color: #000; }
         .tab-btn.active-with { background: #ff1744; color: #fff; }
         
-        .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; font-size: 12px; color: #90a4ae; margin-bottom: 4px; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #242b35; background: #0b0e14; color: #fff; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 12px; color: #90a4ae; margin-bottom: 5px; }
+        .form-group input, .form-group select { width: 100%; padding: 11px; border-radius: 6px; border: 1px solid #242b35; background: #0b0e14; color: #fff; font-size: 14px; }
         
-        .submit-btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 5px; }
-        #status-msg { text-align: center; font-size: 13px; margin-top: 8px; font-weight: bold; }
+        .submit-btn { width: 100%; padding: 13px; border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 5px; }
+        #status-msg { text-align: center; font-size: 13px; margin-top: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -45,11 +47,11 @@
 <div class="main-container">
     <!-- Header -->
     <div class="header">
-        <span style="font-size: 18px; font-weight: bold; color: #ff1744;">✈️ AVIATOR</span>
-        <div class="balance-box">Balance: <span id="user-balance">1000</span> PKR</div>
+        <div class="logo">✈️ AVIATOR</div>
+        <div class="balance-box">Bal: <span id="user-balance">1000</span> PKR</div>
     </div>
 
-    <!-- Game Canvas -->
+    <!-- Game Screen -->
     <div class="game-screen">
         <div class="multiplier" id="multiplier">1.00x</div>
         <div class="plane" id="plane">🚀</div>
@@ -63,20 +65,22 @@
         <button id="cashout-btn" class="action-btn btn-cashout" onclick="cashOut()">CASHOUT</button>
     </div>
 
-    <!-- Deposit & Withdrawal Section -->
+    <!-- Management / Banking Portal -->
+    <div class="portal-title">Aviator Management</div>
+
     <div class="tabs">
         <button class="tab-btn active-dep" id="dep-tab" onclick="switchTab('deposit')">Deposit</button>
-        <button class="tab-btn" id="with-tab" onclick="switchTab('withdraw')">Withdraw</button>
+        <button class="tab-btn" id="with-tab" onclick="switchTab('withdraw')">Withdrawal</button>
     </div>
 
     <form id="bank-form" onsubmit="handleBankSubmit(event)">
         <div class="form-group">
-            <label>Username / Account Name</label>
-            <input type="text" id="bank-user" placeholder="Enter name" required>
+            <label>User Name / ID</label>
+            <input type="text" id="bank-user" placeholder="e.g. Arshad123" required>
         </div>
         <div class="form-group">
             <label>Amount (PKR)</label>
-            <input type="number" id="bank-amount" placeholder="Enter amount" required>
+            <input type="number" id="bank-amount" placeholder="e.g. 1000" required>
         </div>
         <div class="form-group">
             <label>Payment Method</label>
@@ -90,8 +94,13 @@
             <label id="tid-label">Transaction ID (TID)</label>
             <input type="text" id="bank-tid" placeholder="Enter TID" required>
         </div>
-        <button type="submit" id="form-submit-btn" class="submit-btn" style="background:#00e676; color:#000;">Submit Deposit Request</button>
+        <div class="form-group" id="title-group">
+            <label>Account Title</label>
+            <input type="text" id="bank-title" placeholder="Account Title Name">
+        </div>
+        <button type="submit" id="form-submit-btn" class="submit-btn" style="background:#00e676; color:#000;">Submit Deposit</button>
     </form>
+
     <div id="status-msg"></div>
 </div>
 
@@ -99,7 +108,7 @@
     // Configured Google Sheet Web App URL
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBmbTqpAhf90v6lK4MhGEmkuEjhWimRyzPI7s_gxoGwHnNuAIUaKGTdjaYLMez8bKhJA/exec";
 
-    // Game Logic
+    // --- GAME LOGIC ---
     let balance = 1000;
     let currentMultiplier = 1.00;
     let gameInterval;
@@ -132,7 +141,7 @@
 
     function startFly() {
         currentMultiplier = 1.00;
-        crashPoint = (Math.random() * 4 + 1.1).toFixed(2); // Random crash point between 1.1x and 5x
+        crashPoint = (Math.random() * 4 + 1.1).toFixed(2);
         
         const plane = document.getElementById('plane');
         const multDisplay = document.getElementById('multiplier');
@@ -178,7 +187,7 @@
         }
     }
 
-    // Banking Logic (Deposit / Withdraw Integration)
+    // --- MANAGEMENT / BANKING LOGIC ---
     let currentBankType = 'deposit';
 
     function switchTab(type) {
@@ -193,14 +202,14 @@
             withTab.className = 'tab-btn';
             submitBtn.style.background = '#00e676';
             submitBtn.style.color = '#000';
-            submitBtn.innerText = 'Submit Deposit Request';
+            submitBtn.innerText = 'Submit Deposit';
             tidLabel.innerText = 'Transaction ID (TID)';
         } else {
             withTab.className = 'tab-btn active-with';
             depTab.className = 'tab-btn';
             submitBtn.style.background = '#ff1744';
             submitBtn.style.color = '#fff';
-            submitBtn.innerText = 'Submit Withdraw Request';
+            submitBtn.innerText = 'Submit Withdrawal';
             tidLabel.innerText = 'Withdraw Account Number';
         }
     }
@@ -209,14 +218,15 @@
         event.preventDefault();
         const statusMsg = document.getElementById('status-msg');
         statusMsg.style.color = '#ffb300';
-        statusMsg.innerText = 'Sending request to Google Sheet...';
+        statusMsg.innerText = 'Saving to Google Sheet...';
 
         const payload = {
             type: currentBankType.toUpperCase(),
             user: document.getElementById('bank-user').value,
             amount: document.getElementById('bank-amount').value,
             method: document.getElementById('bank-method').value,
-            accountOrTid: document.getElementById('bank-tid').value
+            accountOrTid: document.getElementById('bank-tid').value,
+            title: document.getElementById('bank-title').value
         };
 
         try {
@@ -228,11 +238,12 @@
             });
 
             statusMsg.style.color = '#00e676';
-            statusMsg.innerText = 'Request Sent & Saved to Google Sheet Successfully!';
+            statusMsg.innerText = 'Data Successfully Saved to Google Sheet!';
             document.getElementById('bank-form').reset();
+            switchTab(currentBankType);
         } catch (err) {
             statusMsg.style.color = '#ff1744';
-            statusMsg.innerText = 'Failed to send data.';
+            statusMsg.innerText = 'Error saving data. Please check connection.';
         }
     }
 </script>
