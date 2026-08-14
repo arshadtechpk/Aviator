@@ -1,5 +1,5 @@
 :root {
-  --bg-color: #0b0e14;
+  --bg-dark: #0b0e14;
   --card-bg: #151a23;
   --input-bg: #0d1117;
   --accent-green: #00e676;
@@ -18,215 +18,168 @@
 }
 
 body {
-  background-color: var(--bg-color);
+  background-color: var(--bg-dark);
   color: var(--text-main);
-  display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
-  padding: 15px;
+  display: flex;
+  flex-direction: column;
 }
 
-.app-card {
+/* Header Navbar */
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.logo {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.logo .highlight {
+  color: var(--accent-red);
+  font-size: 0.8rem;
+  margin-left: 4px;
+  background: rgba(255, 51, 102, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.auth-btn {
+  background: var(--accent-green);
+  color: #000;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--accent-green-glow);
+}
+
+.wallet-badge {
+  background: rgba(0, 230, 118, 0.1);
+  border: 1px solid var(--accent-green);
+  padding: 6px 14px;
+  border-radius: 20px;
+  color: var(--accent-green);
+  font-weight: 700;
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
   width: 100%;
-  max-width: 420px;
+}
+
+@media (min-width: 768px) {
+  .dashboard-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.game-card, .wallet-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 20px;
+  border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
-.navbar {
+.game-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 800;
-  font-size: 1.1rem;
+.live-indicator {
   color: var(--accent-red);
-}
-
-.brand small {
-  font-size: 0.65rem;
-  background: rgba(255, 51, 102, 0.15);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-}
-
-.btn-login-toggle {
-  background: var(--accent-green);
-  color: #000;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-weight: 700;
-  font-size: 0.8rem;
-  cursor: pointer;
-  box-shadow: 0 0 10px var(--accent-green-glow);
-}
-
-.wallet-badge {
-  background: rgba(0, 230, 118, 0.08);
-  border: 1px solid var(--accent-green);
-  padding: 6px 14px;
-  border-radius: 30px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--accent-green);
-  box-shadow: 0 0 12px var(--accent-green-glow);
-}
-
-.currency-label {
   font-size: 0.75rem;
-  opacity: 0.8;
-  margin-right: 4px;
-}
-
-/* Auth Box Styling */
-.auth-box {
-  background: rgba(13, 17, 23, 0.8);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 15px;
-  display: block; /* By default shown */
-}
-
-.auth-tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 12px;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 8px;
-}
-
-.auth-tab {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
   font-weight: 700;
-  font-size: 0.85rem;
-  padding: 5px;
-  cursor: pointer;
 }
 
-.auth-tab.active {
-  color: var(--accent-green);
-  border-bottom: 2px solid var(--accent-green);
-}
-
-.game-viewport {
-  position: relative;
-  background: radial-gradient(circle at center, #1c2333 0%, #0b0e14 100%);
+.multiplier-display {
+  background: radial-gradient(circle, #1c2333 0%, #0b0e14 100%);
   height: 180px;
-  border-radius: 14px;
-  border: 1px solid var(--border-color);
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
 }
 
-.multiplier-display {
+.multiplier-value {
   font-size: 3.5rem;
   font-weight: 800;
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-}
-
-.multiplier-display small {
-  font-size: 2rem;
-}
-
-.status-badge {
-  font-size: 0.7rem;
-  letter-spacing: 2px;
-  color: var(--accent-green);
-  background: rgba(0, 230, 118, 0.1);
-  padding: 3px 10px;
-  border-radius: 12px;
-  margin-top: 5px;
-}
-
-.bet-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 25px;
-}
-
-.input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.currency-tag {
-  position: absolute;
-  left: 12px;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-weight: 700;
-}
-
-.input-wrapper input {
-  width: 100%;
-  background: var(--input-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 12px 12px 12px 45px;
   color: #fff;
-  font-weight: 700;
-  font-size: 1.1rem;
-  outline: none;
 }
 
-.btn-primary {
-  background: var(--accent-green);
-  color: #000;
-  border: none;
-  border-radius: 10px;
-  font-weight: 800;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 15px var(--accent-green-glow);
+.plane-icon {
+  font-size: 2rem;
+  margin-top: 10px;
 }
 
-.management-card {
-  background: rgba(13, 17, 23, 0.5);
-  border: 1px solid var(--border-color);
-  border-radius: 14px;
-  padding: 15px;
-}
-
-.card-title {
-  text-align: center;
-  font-size: 0.85rem;
-  letter-spacing: 1.5px;
-  color: var(--accent-green);
+.betting-controls .input-group {
   margin-bottom: 12px;
 }
 
-.tab-segment {
+.betting-controls label, .wallet-form label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.betting-controls input, .wallet-form input, .wallet-form select, .modal-card input {
+  width: 100%;
+  padding: 12px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: #fff;
+  outline: none;
+  font-weight: 600;
+}
+
+.betting-controls input:focus, .wallet-form input:focus, .wallet-form select:focus {
+  border-color: var(--accent-green);
+}
+
+.bet-btn, .submit-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent-green);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.withdraw-bg {
+  background: var(--accent-red);
+  color: #fff;
+}
+
+/* Wallet Tabs */
+.wallet-tabs {
   display: flex;
   background: var(--input-bg);
   padding: 4px;
-  border-radius: 10px;
+  border-radius: 8px;
   margin-bottom: 15px;
 }
 
@@ -236,11 +189,9 @@ body {
   border: none;
   background: transparent;
   color: var(--text-muted);
-  font-weight: 600;
-  font-size: 0.85rem;
-  border-radius: 8px;
+  font-weight: 700;
   cursor: pointer;
-  transition: 0.3s;
+  border-radius: 6px;
 }
 
 .tab-btn.active {
@@ -248,51 +199,67 @@ body {
   color: #000;
 }
 
-.pro-form .form-group {
+.instruction {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 15px;
+}
+
+.form-group {
   margin-bottom: 12px;
 }
 
-.pro-form label {
-  display: block;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-bottom: 5px;
-  letter-spacing: 0.5px;
+/* Modal Popup Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  z-index: 100;
 }
 
-.pro-form input, .pro-form select {
-  width: 100%;
-  background: var(--input-bg);
+.modal-card {
+  background: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 10px 12px;
-  color: #fff;
-  font-size: 0.9rem;
-  outline: none;
-}
-
-.pro-form input:focus, .pro-form select:focus {
-  border-color: var(--accent-green);
-}
-
-.btn-action {
+  padding: 25px;
+  border-radius: 16px;
   width: 100%;
-  padding: 12px;
+  max-width: 380px;
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px; right: 15px;
+  background: transparent;
   border: none;
-  border-radius: 8px;
-  font-weight: 800;
-  font-size: 0.9rem;
-  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 1.2rem;
   cursor: pointer;
 }
 
-.btn-deposit {
-  background: var(--accent-green);
-  color: #000;
+.modal-tabs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
 }
 
-.btn-withdraw {
-  background: var(--accent-red);
-  color: #fff;
+.modal-tab {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.modal-tab.active {
+  color: var(--accent-green);
+  border-bottom: 2px solid var(--accent-green);
 }
