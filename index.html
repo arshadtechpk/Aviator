@@ -1,256 +1,238 @@
 <!DOCTYPE html>
-<html lang="ur" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aviator Data Portal</title>
+    <title>Aviator Game & Portal</title>
     <style>
-        :root {
-            --bg-color: #0b0e14;
-            --card-bg: #151a23;
-            --accent-green: #00e676;
-            --accent-red: #ff1744;
-            --text-main: #ffffff;
-            --text-sub: #90a4ae;
-            --border-color: #242b35;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #0b0e14; color: #fff; padding: 10px; display: flex; justify-content: center; }
+        .main-container { width: 100%; max-width: 480px; background: #151a23; border-radius: 12px; padding: 15px; border: 1px solid #242b35; }
+        
+        /* Top Navigation */
+        .header { display: flex; justify-content: space-between; align-items: center; background: #1e2530; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; }
+        .balance-box { font-size: 16px; font-weight: bold; color: #00e676; }
+        
+        /* Game Screen */
+        .game-screen { position: relative; width: 100%; height: 220px; background: radial-gradient(circle, #1a2230 0%, #0b0e14 100%); border-radius: 10px; border: 1px solid #242b35; overflow: hidden; display: flex; justify-content: center; align-items: center; margin-bottom: 15px; }
+        .multiplier { font-size: 42px; font-weight: bold; color: #fff; z-index: 2; }
+        .plane { position: absolute; bottom: 20px; left: 20px; font-size: 32px; transition: transform 0.1s linear; display: none; }
+        .crashed-text { color: #ff1744; font-size: 20px; font-weight: bold; position: absolute; bottom: 30px; display: none; }
+        
+        /* Betting Section */
+        .bet-section { display: flex; gap: 10px; margin-bottom: 15px; }
+        .bet-input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #242b35; background: #0b0e14; color: #fff; font-size: 16px; text-align: center; }
+        .action-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .btn-bet { background: #00e676; color: #000; }
+        .btn-cashout { background: #ffb300; color: #000; display: none; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 15px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 480px;
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            border: 1px solid var(--border-color);
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: var(--accent-green);
-            font-size: 22px;
-        }
-
-        .tab-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            background: #1e2530;
-            color: var(--text-sub);
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .tab-btn.active-deposit {
-            background: var(--accent-green);
-            color: #000;
-        }
-
-        .tab-btn.active-withdraw {
-            background: var(--accent-red);
-            color: #fff;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: var(--text-sub);
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: #0b0e14;
-            color: #fff;
-            box-sizing: border-box;
-            font-size: 15px;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent-green);
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: 0.2s;
-        }
-
-        .btn-deposit {
-            background: var(--accent-green);
-            color: #000;
-        }
-
-        .btn-withdraw {
-            background: var(--accent-red);
-            color: #fff;
-        }
-
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        #status-msg {
-            margin-top: 15px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 14px;
-        }
+        /* Banking Tabs & Form */
+        .tabs { display: flex; gap: 10px; margin-bottom: 10px; border-top: 1px solid #242b35; padding-top: 15px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 6px; background: #1e2530; color: #90a4ae; font-weight: bold; cursor: pointer; }
+        .tab-btn.active-dep { background: #00e676; color: #000; }
+        .tab-btn.active-with { background: #ff1744; color: #fff; }
+        
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-size: 12px; color: #90a4ae; margin-bottom: 4px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #242b35; background: #0b0e14; color: #fff; }
+        
+        .submit-btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        #status-msg { text-align: center; font-size: 13px; margin-top: 8px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <h2>Aviator Management</h2>
-
-    <div class="tab-buttons">
-        <button class="tab-btn active-deposit" id="deposit-tab" onclick="switchTab('deposit')">Deposit</button>
-        <button class="tab-btn" id="withdraw-tab" onclick="switchTab('withdraw')">Withdrawal</button>
+<div class="main-container">
+    <!-- Header -->
+    <div class="header">
+        <span style="font-size: 18px; font-weight: bold; color: #ff1744;">✈️ AVIATOR</span>
+        <div class="balance-box">Balance: <span id="user-balance">1000</span> PKR</div>
     </div>
 
-    <form id="data-form" onsubmit="handleFormSubmit(event)">
-        <div class="form-group">
-            <label for="username">User Name / ID</label>
-            <input type="text" id="username" placeholder="e.g. Arshad123" required>
-        </div>
+    <!-- Game Canvas -->
+    <div class="game-screen">
+        <div class="multiplier" id="multiplier">1.00x</div>
+        <div class="plane" id="plane">🚀</div>
+        <div class="crashed-text" id="crashed-text">FLEW AWAY!</div>
+    </div>
 
-        <div class="form-group">
-            <label for="amount">Amount (PKR)</label>
-            <input type="number" id="amount" placeholder="e.g. 1000" required>
-        </div>
+    <!-- Bet Controls -->
+    <div class="bet-section">
+        <input type="number" id="bet-amount" class="bet-input" value="100" min="10">
+        <button id="bet-btn" class="action-btn btn-bet" onclick="placeBet()">BET</button>
+        <button id="cashout-btn" class="action-btn btn-cashout" onclick="cashOut()">CASHOUT</button>
+    </div>
 
+    <!-- Deposit & Withdrawal Section -->
+    <div class="tabs">
+        <button class="tab-btn active-dep" id="dep-tab" onclick="switchTab('deposit')">Deposit</button>
+        <button class="tab-btn" id="with-tab" onclick="switchTab('withdraw')">Withdraw</button>
+    </div>
+
+    <form id="bank-form" onsubmit="handleBankSubmit(event)">
         <div class="form-group">
-            <label for="method">Payment Method</label>
-            <select id="method" required>
+            <label>Username / Account Name</label>
+            <input type="text" id="bank-user" placeholder="Enter name" required>
+        </div>
+        <div class="form-group">
+            <label>Amount (PKR)</label>
+            <input type="number" id="bank-amount" placeholder="Enter amount" required>
+        </div>
+        <div class="form-group">
+            <label>Payment Method</label>
+            <select id="bank-method">
                 <option value="Easypaisa">Easypaisa</option>
                 <option value="JazzCash">JazzCash</option>
-                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Bank">Bank Transfer</option>
             </select>
         </div>
-
         <div class="form-group">
-            <label id="account-label" for="accountOrTid">Transaction ID (TID)</label>
-            <input type="text" id="accountOrTid" placeholder="Enter TID" required>
+            <label id="tid-label">Transaction ID (TID)</label>
+            <input type="text" id="bank-tid" placeholder="Enter TID" required>
         </div>
-
-        <div class="form-group" id="title-group">
-            <label for="accountTitle">Account Title</label>
-            <input type="text" id="accountTitle" placeholder="Account Title Name">
-        </div>
-
-        <button type="submit" id="submit-btn" class="submit-btn btn-deposit">Submit Deposit</button>
+        <button type="submit" id="form-submit-btn" class="submit-btn" style="background:#00e676; color:#000;">Submit Deposit Request</button>
     </form>
-
     <div id="status-msg"></div>
 </div>
 
 <script>
     // Configured Google Sheet Web App URL
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBmbTqpAhf90v6lK4MhGEmkuEjhWimRyzPI7s_gxoGwHnNuAIUaKGTdjaYLMez8bKhJA/exec";
-    
-    let currentType = 'deposit';
 
-    function switchTab(type) {
-        currentType = type;
-        const depTab = document.getElementById('deposit-tab');
-        const withTab = document.getElementById('withdraw-tab');
-        const submitBtn = document.getElementById('submit-btn');
-        const accountLabel = document.getElementById('account-label');
-        const titleGroup = document.getElementById('title-group');
+    // Game Logic
+    let balance = 1000;
+    let currentMultiplier = 1.00;
+    let gameInterval;
+    let isPlaying = false;
+    let betAmount = 0;
+    let crashPoint = 0;
 
-        if (type === 'deposit') {
-            depTab.className = 'tab-btn active-deposit';
-            withTab.className = 'tab-btn';
-            submitBtn.className = 'submit-btn btn-deposit';
-            submitBtn.innerText = 'Submit Deposit';
-            accountLabel.innerText = 'Transaction ID (TID)';
-            document.getElementById('accountOrTid').placeholder = 'Enter TID';
-            titleGroup.style.display = 'block';
-        } else {
-            withTab.className = 'tab-btn active-withdraw';
-            depTab.className = 'tab-btn';
-            submitBtn.className = 'submit-btn btn-withdraw';
-            submitBtn.innerText = 'Submit Withdrawal Request';
-            accountLabel.innerText = 'Withdraw Account Number';
-            document.getElementById('accountOrTid').placeholder = 'Enter Account Number';
-            titleGroup.style.display = 'block';
+    function updateBalanceDisplay() {
+        document.getElementById('user-balance').innerText = balance.toFixed(2);
+    }
+
+    function placeBet() {
+        let inputVal = parseFloat(document.getElementById('bet-amount').value);
+        if (isNaN(inputVal) || inputVal > balance || inputVal <= 0) {
+            alert('Invalid or Insufficient Balance!');
+            return;
+        }
+
+        betAmount = inputVal;
+        balance -= betAmount;
+        updateBalanceDisplay();
+
+        isPlaying = true;
+        document.getElementById('bet-btn').style.display = 'none';
+        document.getElementById('cashout-btn').style.display = 'block';
+        document.getElementById('crashed-text').style.display = 'none';
+
+        startFly();
+    }
+
+    function startFly() {
+        currentMultiplier = 1.00;
+        crashPoint = (Math.random() * 4 + 1.1).toFixed(2); // Random crash point between 1.1x and 5x
+        
+        const plane = document.getElementById('plane');
+        const multDisplay = document.getElementById('multiplier');
+        plane.style.display = 'block';
+
+        let posX = 20, posY = 20;
+
+        gameInterval = setInterval(() => {
+            currentMultiplier += 0.03;
+            multDisplay.innerText = currentMultiplier.toFixed(2) + 'x';
+
+            posX += 2;
+            posY += 1.2;
+            plane.style.transform = `translate(${posX}px, -${posY}px)`;
+
+            if (currentMultiplier >= crashPoint) {
+                gameOver(false);
+            }
+        }, 100);
+    }
+
+    function cashOut() {
+        if (!isPlaying) return;
+        let winAmount = betAmount * currentMultiplier;
+        balance += winAmount;
+        updateBalanceDisplay();
+        alert(`You Cashed Out at ${currentMultiplier.toFixed(2)}x! Won: ${winAmount.toFixed(2)} PKR`);
+        gameOver(true);
+    }
+
+    function gameOver(isWin) {
+        clearInterval(gameInterval);
+        isPlaying = false;
+
+        document.getElementById('plane').style.display = 'none';
+        document.getElementById('plane').style.transform = 'translate(0px, 0px)';
+        document.getElementById('cashout-btn').style.display = 'none';
+        document.getElementById('bet-btn').style.display = 'block';
+
+        if (!isWin) {
+            document.getElementById('crashed-text').style.display = 'block';
+            document.getElementById('multiplier').innerText = '1.00x';
         }
     }
 
-    async function handleFormSubmit(event) {
-        event.preventDefault();
+    // Banking Logic (Deposit / Withdraw Integration)
+    let currentBankType = 'deposit';
 
-        const submitBtn = document.getElementById('submit-btn');
+    function switchTab(type) {
+        currentBankType = type;
+        const depTab = document.getElementById('dep-tab');
+        const withTab = document.getElementById('with-tab');
+        const submitBtn = document.getElementById('form-submit-btn');
+        const tidLabel = document.getElementById('tid-label');
+
+        if (type === 'deposit') {
+            depTab.className = 'tab-btn active-dep';
+            withTab.className = 'tab-btn';
+            submitBtn.style.background = '#00e676';
+            submitBtn.style.color = '#000';
+            submitBtn.innerText = 'Submit Deposit Request';
+            tidLabel.innerText = 'Transaction ID (TID)';
+        } else {
+            withTab.className = 'tab-btn active-with';
+            depTab.className = 'tab-btn';
+            submitBtn.style.background = '#ff1744';
+            submitBtn.style.color = '#fff';
+            submitBtn.innerText = 'Submit Withdraw Request';
+            tidLabel.innerText = 'Withdraw Account Number';
+        }
+    }
+
+    async function handleBankSubmit(event) {
+        event.preventDefault();
         const statusMsg = document.getElementById('status-msg');
+        statusMsg.style.color = '#ffb300';
+        statusMsg.innerText = 'Sending request to Google Sheet...';
 
         const payload = {
-            type: currentType.toUpperCase(),
-            user: document.getElementById('username').value,
-            amount: document.getElementById('amount').value,
-            method: document.getElementById('method').value,
-            accountOrTid: document.getElementById('accountOrTid').value,
-            title: document.getElementById('accountTitle').value
+            type: currentBankType.toUpperCase(),
+            user: document.getElementById('bank-user').value,
+            amount: document.getElementById('bank-amount').value,
+            method: document.getElementById('bank-method').value,
+            accountOrTid: document.getElementById('bank-tid').value
         };
-
-        submitBtn.disabled = true;
-        statusMsg.style.color = '#ffeb3b';
-        statusMsg.innerText = 'Saving to Google Sheet...';
 
         try {
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
 
             statusMsg.style.color = '#00e676';
-            statusMsg.innerText = 'Data Successfully Saved to Google Sheet!';
-            document.getElementById('data-form').reset();
-            switchTab(currentType);
-
-        } catch (error) {
+            statusMsg.innerText = 'Request Sent & Saved to Google Sheet Successfully!';
+            document.getElementById('bank-form').reset();
+        } catch (err) {
             statusMsg.style.color = '#ff1744';
-            statusMsg.innerText = 'Error saving data. Please check connection.';
-            console.error('Error:', error);
-        } finally {
-            submitBtn.disabled = false;
+            statusMsg.innerText = 'Failed to send data.';
         }
     }
 </script>
