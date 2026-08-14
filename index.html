@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crash Demo</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#090d16;color:#fff;font-family:Arial,sans-serif}
+.app{max-width:430px;margin:auto;min-height:100vh;background:#111827}
+header{padding:16px 18px;display:flex;justify-content:space-between;align-items:center;background:#171d2b}
+.logo{font-size:22px;font-weight:800}.balance{background:#222b3d;padding:9px 12px;border-radius:20px;color:#ffd54a}
+.game{margin:12px;background:#090d16;border-radius:18px;overflow:hidden;position:relative;height:300px;border:1px solid #293247}
+canvas{width:100%;height:100%}.mult{position:absolute;left:0;right:0;top:95px;text-align:center;font-size:52px;font-weight:900}
+.status{position:absolute;top:155px;width:100%;text-align:center;color:#aab4c8}
+.panel{padding:14px}.row{display:flex;gap:10px}.box{flex:1;background:#1b2333;border-radius:14px;padding:12px}
+label{font-size:12px;color:#9ca8bb;display:block;margin-bottom:7px}
+input{width:100%;background:#0d1320;color:white;border:1px solid #34405a;border-radius:10px;padding:12px;font-size:16px}
+button{border:0;border-radius:12px;padding:13px;font-weight:800;font-size:16px;cursor:pointer}
+.bet{background:#21c77a;color:#07130d;flex:1}.cash{background:#ffbd3b;color:#1b1200;flex:1}
+button:disabled{opacity:.4;cursor:not-allowed}.history{margin-top:12px;background:#1b2333;border-radius:14px;padding:12px}
+.history h3{margin:0 0 9px;font-size:14px}.chips{display:flex;gap:7px;flex-wrap:wrap}.chip{background:#263149;padding:7px 9px;border-radius:9px;font-size:12px}
+.note{text-align:center;color:#7f8ba0;font-size:11px;padding:12px}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="logo">✈️ CRASH DEMO</div><div class="balance">🪙 <span id="balance">10000</span></div></header>
+<div class="game"><canvas id="c"></canvas><div class="mult" id="mult">1.00x</div><div class="status" id="status">Place your virtual bet</div></div>
+<div class="panel">
+<div class="row">
+<div class="box"><label>BET (virtual coins)</label><input id="bet" type="number" min="1" max="1000" value="10"></div>
+<div class="box"><label>PAYOUT</label><input id="payout" value="0" disabled></div>
+</div>
+<div class="row" style="margin-top:10px"><button class="bet" id="betBtn">BET 10</button><button class="cash" id="cashBtn" disabled>CASH OUT</button></div>
+<div class="history"><h3>Previous rounds</h3><div class="chips" id="history"></div></div>
+</div>
+<div class="note">Demo only • Uses virtual coins • No deposits or withdrawals</div>
+</div>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+const multEl=document.getElementById('mult'),statusEl=document.getElementById('status');
+const balEl=document.getElementById('balance'),betEl=document.getElementById('bet'),payoutEl=document.getElementById('payout');
+const betBtn=document.getElementById('betBtn'),cashBtn=document.getElementById('cashBtn'),hist=document.getElementById('history');
+let balance=10000, bet=10, running=false, crashed=false, cashed=false, m=1, crashAt=0, start=0, raf;
+
+function resize(){canvas.width=canvas.clientWidth*devicePixelRatio;canvas.height=canvas.clientHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
+addEventListener('resize',resize); resize();
+
+function draw(t){
+ const w=canvas.clientWidth,h=canvas.clientHeight;ctx.clearRect(0,0,w,h);
+ ctx.strokeStyle='#202a3d';ctx.lineWidth=1;
+ for(let x=0;x<w;x+=45){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
+ for(let y=0;y<h;y+=45){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+ if(running){
+   const p=Math.min(1,(t-start)/7000), x=25+p*(w-55), y=h-30-p*(h-75);
+   ctx.strokeStyle='#ff4f5e';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(25,h-30);ctx.quadraticCurveTo(w*.45,h*.55,x,y);ctx.stroke();
+   ctx.font='28px Arial';ctx.fillText('✈',x-12,y-12);
+ }
+}
+function update(){balEl.textContent=balance.toFixed(0);payoutEl.value=cashed?((bet*m).toFixed(0)):0;betBtn.textContent='BET '+Math.min(1000,Math.max(1,+betEl.value||1))}
+betEl.oninput=update;
+
+function newRound(){
+ running=true;crashed=false;cashed=false;m=1;start=performance.now();
+ // Demo randomness only; no real-money or payout logic.
+ crashAt=1.15+Math.random()*7.5;
+ statusEl.textContent='Flying...';cashBtn.disabled=false;betBtn.disabled=true;
+ function frame(t){
+   if(!running)return;
+   const sec=(t-start)/1000;
+   m=1+sec*0.42+sec*sec*0.035;
+   if(m>=crashAt){m=crashAt;running=false;crashed=true;cashBtn.disabled=true;statusEl.textContent='💥 CRASHED';addHistory(m);draw(t);multEl.textContent=m.toFixed(2)+'x';return}
+   multEl.textContent=m.toFixed(2)+'x';draw(t);raf=requestAnimationFrame(frame)
+ }
+ raf=requestAnimationFrame(frame);
+}
+betBtn.onclick=()=>{
+ if(running)return;
+ bet=Math.floor(+betEl.value||0);if(bet<1||bet>1000){alert('Bet 1 to 1000 virtual coins.');return}
+ if(bet>balance){alert('Not enough virtual coins.');return}
+ balance-=bet;update();newRound();
+}
+cashBtn.onclick=()=>{
+ if(!running||cashed)return;
+ cashed=true;running=false;cancelAnimationFrame(raf);cashBtn.disabled=true;
+ const win=Math.floor(bet*m);balance+=win;statusEl.textContent='✅ Cashed out at '+m.toFixed(2)+'x';update();addHistory(m);draw(performance.now());
+}
+function addHistory(x){
+ const d=document.createElement('span');d.className='chip';d.textContent=x.toFixed(2)+'x';hist.prepend(d);
+ while(hist.children.length>8)hist.lastChild.remove();
+}
+update();draw(0);
+</script>
+</body>
+</html>
