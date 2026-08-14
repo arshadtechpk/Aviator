@@ -4,7 +4,7 @@ const SUPABASE_KEY = 'Sb_publishable_PQEgFp8leGVzvbD16SjmQQ_EVWtIc6R';
 
 let supabase = null;
 
-// Initialize Supabase Safely
+// Initialize Supabase safely
 window.addEventListener('DOMContentLoaded', () => {
   if (window.supabase) {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -70,7 +70,7 @@ function switchTab(tab) {
 // User Signup System
 async function handleSignup(event) {
   event.preventDefault();
-  if (!supabase) return alert('Database connecting... please try again in 3 seconds');
+  if (!supabase) return alert('Database connecting... Please try again in 3 seconds');
 
   const username = document.getElementById('signup-username').value;
   const phone = document.getElementById('signup-phone').value;
@@ -91,7 +91,7 @@ async function handleSignup(event) {
 // User Login System
 async function handleLogin(event) {
   event.preventDefault();
-  if (!supabase) return alert('Database connecting... please try again in 3 seconds');
+  if (!supabase) return alert('Database connecting... Please try again in 3 seconds');
 
   const username = document.getElementById('login-username').value;
   const password = document.getElementById('login-password').value;
@@ -118,7 +118,7 @@ async function handleLogin(event) {
 // Submit Deposit System
 async function handleDepositSubmit(event) {
   event.preventDefault();
-  if (!supabase) return alert('Database connecting... please try again in 3 seconds');
+  if (!supabase) return alert('Database connecting... Please try again in 3 seconds');
 
   const username = document.getElementById('dep-username').value;
   const amount = document.getElementById('dep-amount').value;
