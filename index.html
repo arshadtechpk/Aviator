@@ -1,153 +1,158 @@
-// Supabase Database Config
-const SUPABASE_URL = 'https://twhgyqzidkclntfbcadw.supabase.co';
-const SUPABASE_KEY = 'Sb_publishable_PQEgFp8leGVzvbD16SjmQQ_EVWtIc6R';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aviator Pro Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
 
-let supabase = null;
+  <!-- Top Navigation Header -->
+  <header class="top-nav">
+    <div class="logo">
+      <span class="logo-icon">🚀</span>
+      <span class="logo-text">AVIATOR<span class="highlight">PRO</span></span>
+    </div>
 
-// Initialize Supabase safely
-window.addEventListener('DOMContentLoaded', () => {
-  if (window.supabase) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  }
-});
+    <div class="user-actions">
+      <button class="auth-btn" id="auth-btn" onclick="openAuthModal()">Login / Register</button>
+      <div class="wallet-badge" id="wallet-badge" style="display: none;">
+        <span class="currency">PKR</span>
+        <span class="balance" id="balance">0.00</span>
+      </div>
+    </div>
+  </header>
 
-let currentUser = null;
+  <!-- Main Game Container -->
+  <main class="dashboard-container">
+    <section class="game-section">
+      <div class="game-card">
+        <div class="game-header">
+          <h2>LIVE MULTIPLIER</h2>
+          <span class="live-indicator">● LIVE</span>
+        </div>
+        
+        <div class="multiplier-display">
+          <div class="multiplier-value" id="multiplier">1.00x</div>
+          <div class="plane-icon" id="plane">✈️</div>
+        </div>
 
-// Modal Control Functions
-function openAuthModal() {
-  const modal = document.getElementById('auth-modal');
-  if (modal) {
-    modal.style.display = 'flex';
-  }
-}
+        <div class="betting-controls">
+          <div class="input-group">
+            <label for="bet-amount">Bet Amount (PKR)</label>
+            <input type="number" id="bet-amount" value="100" min="10">
+          </div>
+          <button class="bet-btn" id="bet-btn" onclick="placeBet()">PLACE BET</button>
+        </div>
+      </div>
+    </section>
 
-function closeAuthModal() {
-  const modal = document.getElementById('auth-modal');
-  if (modal) {
-    modal.style.display = 'none';
-  }
-}
+    <!-- Deposit Panel -->
+    <section class="wallet-section">
+      <div class="wallet-card">
+        <div class="wallet-tabs">
+          <button class="tab-btn active" id="btn-tab-deposit" onclick="switchTab('deposit')">Deposit</button>
+          <button class="tab-btn" id="btn-tab-withdraw" onclick="switchTab('withdraw')">Withdraw</button>
+        </div>
 
-function switchAuth(type) {
-  const loginForm = document.getElementById('login-form');
-  const signupForm = document.getElementById('signup-form');
-  const tabLogin = document.getElementById('tab-login');
-  const tabSignup = document.getElementById('tab-signup');
+        <form id="deposit-form" class="wallet-form" onsubmit="handleDepositSubmit(event)">
+          <h3>Deposit Funds</h3>
+          <p class="instruction">Send money via EasyPaisa / JazzCash & enter Transaction ID (TID) below.</p>
+          
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="dep-username" placeholder="Enter your username" required>
+          </div>
 
-  if (type === 'login') {
-    loginForm.style.display = 'block';
-    signupForm.style.display = 'none';
-    tabLogin.classList.add('active');
-    tabSignup.classList.remove('active');
-  } else {
-    loginForm.style.display = 'none';
-    signupForm.style.display = 'block';
-    tabLogin.classList.remove('active');
-    tabSignup.classList.add('active');
-  }
-}
+          <div class="form-group">
+            <label>Payment Method</label>
+            <select id="dep-method">
+              <option value="easypaisa">EasyPaisa</option>
+              <option value="jazzcash">JazzCash</option>
+            </select>
+          </div>
 
-// Tab Switcher Functions
-function switchTab(tab) {
-  const depositForm = document.getElementById('deposit-form');
-  const withdrawForm = document.getElementById('withdraw-form');
-  const btnDeposit = document.getElementById('btn-tab-deposit');
-  const btnWithdraw = document.getElementById('btn-tab-withdraw');
+          <div class="form-group">
+            <label>Amount (PKR)</label>
+            <input type="number" id="dep-amount" placeholder="Min 100 PKR" min="100" required>
+          </div>
 
-  if (tab === 'deposit') {
-    depositForm.style.display = 'block';
-    withdrawForm.style.display = 'none';
-    btnDeposit.classList.add('active');
-    btnWithdraw.classList.remove('active');
-  } else {
-    depositForm.style.display = 'none';
-    withdrawForm.style.display = 'block';
-    btnDeposit.classList.remove('active');
-    btnWithdraw.classList.add('active');
-  }
-}
+          <div class="form-group">
+            <label>Transaction ID (TID)</label>
+            <input type="text" id="dep-tid" placeholder="Enter 11 or 12 digit TID" required>
+          </div>
 
-// User Signup System
-async function handleSignup(event) {
-  event.preventDefault();
-  if (!supabase) return alert('Database connecting... Please try again in 3 seconds');
+          <button type="submit" class="submit-btn">Submit Deposit Request</button>
+        </form>
 
-  const username = document.getElementById('signup-username').value;
-  const phone = document.getElementById('signup-phone').value;
-  const password = document.getElementById('signup-password').value;
+        <form id="withdraw-form" class="wallet-form" style="display: none;" onsubmit="handleWithdrawSubmit(event)">
+          <h3>Withdraw Funds</h3>
+          <div class="form-group">
+            <label>Payment Method</label>
+            <select id="wit-method">
+              <option value="easypaisa">EasyPaisa</option>
+              <option value="jazzcash">JazzCash</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Account Mobile Number</label>
+            <input type="text" id="wit-account" placeholder="03XXXXXXXXX" required>
+          </div>
+          <div class="form-group">
+            <label>Amount (PKR)</label>
+            <input type="number" id="wit-amount" placeholder="Min 500 PKR" min="500" required>
+          </div>
+          <button type="submit" class="submit-btn withdraw-bg">Request Withdrawal</button>
+        </form>
+      </div>
+    </section>
+  </main>
 
-  const { data, error } = await supabase
-    .from('users')
-    .insert([{ username, phone, password, balance: 0 }]);
+  <!-- Login / Signup Modal -->
+  <div class="modal-overlay" id="auth-modal" style="display: none;">
+    <div class="modal-card">
+      <button class="close-btn" onclick="closeAuthModal()">✕</button>
+      
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tab-login" onclick="switchAuth('login')">Login</button>
+        <button class="modal-tab" id="tab-signup" onclick="switchAuth('signup')">Sign Up</button>
+      </div>
 
-  if (error) {
-    alert('Signup Failed: ' + error.message);
-  } else {
-    alert('Account Created Successfully! Please Login.');
-    switchAuth('login');
-  }
-}
+      <!-- Login Form -->
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="login-username" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" required>
+        </div>
+        <button type="submit" class="submit-btn">Login</button>
+      </form>
 
-// User Login System
-async function handleLogin(event) {
-  event.preventDefault();
-  if (!supabase) return alert('Database connecting... Please try again in 3 seconds');
+      <!-- Signup Form -->
+      <form id="signup-form" style="display: none;" onsubmit="handleSignup(event)">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="signup-username" required>
+        </div>
+        <div class="form-group">
+          <label>Mobile Phone</label>
+          <input type="text" id="signup-phone" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="signup-password" required>
+        </div>
+        <button type="submit" class="submit-btn">Create Account</button>
+      </form>
+    </div>
+  </div>
 
-  const username = document.getElementById('login-username').value;
-  const password = document.getElementById('login-password').value;
-
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('username', username)
-    .eq('password', password)
-    .single();
-
-  if (error || !data) {
-    alert('Invalid Username or Password!');
-  } else {
-    currentUser = data;
-    closeAuthModal();
-    document.getElementById('auth-btn').style.display = 'none';
-    document.getElementById('wallet-badge').style.display = 'inline-block';
-    document.getElementById('balance').innerText = Number(data.balance).toFixed(2);
-    alert('Welcome back, ' + data.username + '!');
-  }
-}
-
-// Submit Deposit System
-async function handleDepositSubmit(event) {
-  event.preventDefault();
-  if (!supabase) return alert('Database connecting... Please try again in 3 seconds');
-
-  const username = document.getElementById('dep-username').value;
-  const amount = document.getElementById('dep-amount').value;
-  const payment_method = document.getElementById('dep-method').value;
-  const tid = document.getElementById('dep-tid').value;
-
-  const { data, error } = await supabase
-    .from('deposits')
-    .insert([{ username, amount, payment_method, tid, status: 'pending' }]);
-
-  if (error) {
-    alert('Error submitting deposit: ' + error.message);
-  } else {
-    alert('Deposit Submitted Successfully! Admin approval pending.');
-    event.target.reset();
-  }
-}
-
-function handleWithdrawSubmit(event) {
-  event.preventDefault();
-  alert('Withdrawal Request Submitted!');
-  event.target.reset();
-}
-
-function placeBet() {
-  if (!currentUser) {
-    alert('Please Login first to place a bet!');
-    openAuthModal();
-    return;
-  }
-  alert('Bet Placed Successfully!');
-}
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+</body>
+</html>
