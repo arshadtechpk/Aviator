@@ -3,28 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Crash Demo</title>
+<title>Aviator Crash Demo</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#090d16;color:#fff;font-family:Arial,sans-serif}
 .app{max-width:430px;margin:auto;min-height:100vh;background:#111827}
 header{padding:16px 18px;display:flex;justify-content:space-between;align-items:center;background:#171d2b}
-.logo{font-size:22px;font-weight:800}.balance{background:#222b3d;padding:9px 12px;border-radius:20px;color:#ffd54a}
+.logo{font-size:20px;font-weight:800}.balance{background:#222b3d;padding:9px 12px;border-radius:20px;color:#ffd54a;font-weight:bold}
 .game{margin:12px;background:#090d16;border-radius:18px;overflow:hidden;position:relative;height:300px;border:1px solid #293247}
-canvas{width:100%;height:100%}.mult{position:absolute;left:0;right:0;top:95px;text-align:center;font-size:52px;font-weight:900}
-.status{position:absolute;top:155px;width:100%;text-align:center;color:#aab4c8}
+canvas{width:100%;height:100%}.mult{position:absolute;left:0;right:0;top:80px;text-align:center;font-size:52px;font-weight:900;text-shadow: 0 0 10px rgba(255,255,255,0.2)}
+.status{position:absolute;top:145px;width:100%;text-align:center;color:#aab4c8;font-weight:600}
 .panel{padding:14px}.row{display:flex;gap:10px}.box{flex:1;background:#1b2333;border-radius:14px;padding:12px}
 label{font-size:12px;color:#9ca8bb;display:block;margin-bottom:7px}
-input{width:100%;background:#0d1320;color:white;border:1px solid #34405a;border-radius:10px;padding:12px;font-size:16px}
-button{border:0;border-radius:12px;padding:13px;font-weight:800;font-size:16px;cursor:pointer}
-.bet{background:#21c77a;color:#07130d;flex:1}.cash{background:#ffbd3b;color:#1b1200;flex:1}
-button:disabled{opacity:.4;cursor:not-allowed}.history{margin-top:12px;background:#1b2333;border-radius:14px;padding:12px}
-.history h3{margin:0 0 9px;font-size:14px}.chips{display:flex;gap:7px;flex-wrap:wrap}.chip{background:#263149;padding:7px 9px;border-radius:9px;font-size:12px}
-.note{text-align:center;color:#7f8ba0;font-size:11px;padding:12px}
+input{width:100%;background:#0d1320;color:white;border:1px solid #34405a;border-radius:10px;padding:12px;font-size:16px;font-weight:bold}
+button{border:0;border-radius:12px;padding:14px;font-weight:800;font-size:16px;cursor:pointer;transition:0.2s}
+.bet{background:#10b981;color:#fff;flex:1}.cash{background:#f59e0b;color:#fff;flex:1}
+button:disabled{opacity:.3;cursor:not-allowed}.history{margin-top:12px;background:#1b2333;border-radius:14px;padding:12px}
+.history h3{margin:0 0 9px;font-size:13px;color:#9ca8bb}.chips{display:flex;gap:7px;flex-wrap:wrap}.chip{background:#263149;padding:6px 10px;border-radius:8px;font-size:12px;color:#38bdf8;font-weight:bold}
+.note{text-align:center;color:#6b7280;font-size:11px;padding:12px}
 </style>
 </head>
 <body>
 <div class="app">
-<header><div class="logo">✈️ CRASH DEMO</div><div class="balance">🪙 <span id="balance">10000</span></div></header>
+<header><div class="logo">🚀 AVIATOR DEMO</div><div class="balance">🪙 <span id="balance">10000</span></div></header>
 <div class="game"><canvas id="c"></canvas><div class="mult" id="mult">1.00x</div><div class="status" id="status">Place your virtual bet</div></div>
 <div class="panel">
 <div class="row">
@@ -34,8 +34,9 @@ button:disabled{opacity:.4;cursor:not-allowed}.history{margin-top:12px;backgroun
 <div class="row" style="margin-top:10px"><button class="bet" id="betBtn">BET 10</button><button class="cash" id="cashBtn" disabled>CASH OUT</button></div>
 <div class="history"><h3>Previous rounds</h3><div class="chips" id="history"></div></div>
 </div>
-<div class="note">Demo only • Uses virtual coins • No deposits or withdrawals</div>
+<div class="note">Demo only • Uses virtual coins • No real money</div>
 </div>
+
 <script>
 const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
 const multEl=document.getElementById('mult'),statusEl=document.getElementById('status');
@@ -48,13 +49,46 @@ addEventListener('resize',resize); resize();
 
 function draw(t){
  const w=canvas.clientWidth,h=canvas.clientHeight;ctx.clearRect(0,0,w,h);
- ctx.strokeStyle='#202a3d';ctx.lineWidth=1;
- for(let x=0;x<w;x+=45){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
- for(let y=0;y<h;y+=45){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
- if(running){
-   const p=Math.min(1,(t-start)/7000), x=25+p*(w-55), y=h-30-p*(h-75);
-   ctx.strokeStyle='#ff4f5e';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(25,h-30);ctx.quadraticCurveTo(w*.45,h*.55,x,y);ctx.stroke();
-   ctx.font='28px Arial';ctx.fillText('✈',x-12,y-12);
+ 
+ // Grid lines
+ ctx.strokeStyle='#1a2332';ctx.lineWidth=1;
+ for(let x=0;x<w;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
+ for(let y=0;y<h;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+ 
+ if(running || crashed){
+   const p=Math.min(1,(t-start)/6000);
+   const x=20+p*(w-50);
+   const y=h-20-p*(h-60);
+   
+   // Red area under plane curve
+   ctx.fillStyle='rgba(239, 68, 68, 0.15)';
+   ctx.beginPath();
+   ctx.moveTo(20, h-20);
+   ctx.quadraticCurveTo(w*0.4, h*0.8, x, y);
+   ctx.lineTo(x, h-20);
+   ctx.closePath();
+   ctx.fill();
+
+   // Curve line
+   ctx.strokeStyle='#ef4444';
+   ctx.lineWidth=4;
+   ctx.beginPath();
+   ctx.moveTo(20,h-20);
+   ctx.quadraticCurveTo(w*0.4,h*0.8,x,y);
+   ctx.stroke();
+   
+   // Bright Red Aviator Plane Icon
+   if(running){
+     ctx.save();
+     ctx.translate(x, y);
+     ctx.rotate(-Math.PI / 6); // Plane tilt angle
+     ctx.font='bold 28px Arial';
+     ctx.fillStyle='#ff2a2a';
+     ctx.shadowColor='#ff0000';
+     ctx.shadowBlur=12;
+     ctx.fillText('✈', -12, 10);
+     ctx.restore();
+   }
  }
 }
 
@@ -67,23 +101,25 @@ betEl.oninput=update;
 
 function newRound(){
  running=true;crashed=false;cashed=false;m=1;start=performance.now();
- crashAt=1.15+Math.random()*7.5;
+ crashAt=1.15+Math.random()*8.0;
  statusEl.textContent='Flying...';
+ statusEl.style.color='#aab4c8';
  cashBtn.disabled=false;
  betBtn.disabled=true;
 
  function frame(t){
    if(!running) return;
    const sec=(t-start)/1000;
-   m=1+sec*0.42+sec*sec*0.035;
+   m=1+sec*0.35+sec*sec*0.04;
 
    if(m>=crashAt){
      m=crashAt;
      running=false;
      crashed=true;
      cashBtn.disabled=true;
-     betBtn.disabled=false; // FIX: Resetting Bet Button on Crash
-     statusEl.textContent='💥 CRASHED';
+     betBtn.disabled=false;
+     statusEl.textContent='💥 FLEW AWAY (CRASHED)';
+     statusEl.style.color='#ef4444';
      addHistory(m);
      draw(t);
      multEl.textContent=m.toFixed(2)+'x';
@@ -112,17 +148,21 @@ cashBtn.onclick=()=>{
  running=false;
  cancelAnimationFrame(raf);
  cashBtn.disabled=true;
- betBtn.disabled=false; // FIX: Resetting Bet Button on Cashout
+ betBtn.disabled=false;
  const win=Math.floor(bet*m);
  balance+=win;
  statusEl.textContent='✅ Cashed out at '+m.toFixed(2)+'x';
+ statusEl.style.color='#10b981';
  update();
  addHistory(m);
  draw(performance.now());
 }
 
 function addHistory(x){
- const d=document.createElement('span');d.className='chip';d.textContent=x.toFixed(2)+'x';hist.prepend(d);
+ const d=document.createElement('span');
+ d.className='chip';
+ d.textContent=x.toFixed(2)+'x';
+ hist.prepend(d);
  while(hist.children.length>8)hist.lastChild.remove();
 }
 
