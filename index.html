@@ -6,144 +6,164 @@
   <title>Aviator Pro Dashboard</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Supabase Database Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-  <div class="app-card">
-    
-    <!-- Header Section with Logo & Login Button -->
-    <header class="navbar">
-      <div class="brand">
-        <span class="plane-icon">✈️</span>
-        <span class="logo-text">AVIATOR <small>PRO</small></span>
+  <!-- Top Navigation Header -->
+  <header class="top-nav">
+    <div class="logo">
+      <span class="logo-icon">🚀</span>
+      <span class="logo-text">AVIATOR<span class="highlight">PRO</span></span>
+    </div>
+
+    <div class="user-actions">
+      <button class="auth-btn" id="auth-btn" onclick="openAuthModal()">Login / Register</button>
+      <div class="wallet-badge" id="wallet-badge" style="display: none;">
+        <span class="currency">PKR</span>
+        <span class="balance" id="balance">0.00</span>
       </div>
-      
-      <div class="header-right">
-        <button type="button" class="btn-login-toggle" id="auth-btn" onclick="toggleAuthForm()">Login / Signup</button>
-        <div class="wallet-badge" id="wallet-badge" style="display: none;">
-          <span class="currency-label">PKR</span>
-          <span class="balance" id="balance">1,066.00</span>
+    </div>
+  </header>
+
+  <!-- Main Game & Dashboard Area -->
+  <main class="dashboard-container">
+    
+    <!-- Left Section: Game Screen -->
+    <section class="game-section">
+      <div class="game-card">
+        <div class="game-header">
+          <h2>LIVE MULTIPLIER</h2>
+          <span class="live-indicator">● LIVE</span>
+        </div>
+        
+        <div class="multiplier-display">
+          <div class="multiplier-value" id="multiplier">1.00x</div>
+          <div class="plane-icon" id="plane">✈️</div>
+        </div>
+
+        <div class="betting-controls">
+          <div class="input-group">
+            <label for="bet-amount">Bet Amount (PKR)</label>
+            <input type="number" id="bet-amount" value="100" min="10">
+          </div>
+          <button class="bet-btn" id="bet-btn" onclick="placeBet()">PLACE BET</button>
         </div>
       </div>
-    </header>
+    </section>
 
-    <!-- Login / Signup Collapsible Box -->
-    <div class="auth-box" id="auth-box">
-      <div class="auth-tabs">
-        <button type="button" class="auth-tab active" id="tab-login" onclick="switchAuth('login')">Login</button>
-        <button type="button" class="auth-tab" id="tab-signup" onclick="switchAuth('signup')">Sign Up</button>
+    <!-- Right Section: Deposit & Withdraw Panel -->
+    <section class="wallet-section">
+      <div class="wallet-card">
+        
+        <!-- Tabs -->
+        <div class="wallet-tabs">
+          <button class="tab-btn active" id="btn-tab-deposit" onclick="switchTab('deposit')">Deposit</button>
+          <button class="tab-btn" id="btn-tab-withdraw" onclick="switchTab('withdraw')">Withdraw</button>
+        </div>
+
+        <!-- Deposit Form -->
+        <form id="deposit-form" class="wallet-form" onsubmit="handleDepositSubmit(event)">
+          <h3>Deposit Funds</h3>
+          <p class="instruction">Send money via EasyPaisa / JazzCash & enter Transaction ID (TID) below.</p>
+          
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="dep-username" placeholder="Enter your username" required>
+          </div>
+
+          <div class="form-group">
+            <label>Payment Method</label>
+            <select id="dep-method">
+              <option value="easypaisa">EasyPaisa</option>
+              <option value="jazzcash">JazzCash</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Amount (PKR)</label>
+            <input type="number" id="dep-amount" placeholder="Min 100 PKR" min="100" required>
+          </div>
+
+          <div class="form-group">
+            <label>Transaction ID (TID)</label>
+            <input type="text" id="dep-tid" placeholder="Enter 11 or 12 digit TID" required>
+          </div>
+
+          <button type="submit" class="submit-btn">Submit Deposit Request</button>
+        </form>
+
+        <!-- Withdraw Form -->
+        <form id="withdraw-form" class="wallet-form" style="display: none;" onsubmit="handleWithdrawSubmit(event)">
+          <h3>Withdraw Funds</h3>
+          
+          <div class="form-group">
+            <label>Payment Method</label>
+            <select id="wit-method">
+              <option value="easypaisa">EasyPaisa</option>
+              <option value="jazzcash">JazzCash</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Account Mobile Number</label>
+            <input type="text" id="wit-account" placeholder="03XXXXXXXXX" required>
+          </div>
+
+          <div class="form-group">
+            <label>Amount (PKR)</label>
+            <input type="number" id="wit-amount" placeholder="Min 500 PKR" min="500" required>
+          </div>
+
+          <button type="submit" class="submit-btn withdraw-bg">Request Withdrawal</button>
+        </form>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Login / Signup Modal -->
+  <div class="modal-overlay" id="auth-modal" style="display: none;">
+    <div class="modal-card">
+      <button class="close-btn" onclick="closeAuthModal()">✕</button>
+      
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tab-login" onclick="switchAuth('login')">Login</button>
+        <button class="modal-tab" id="tab-signup" onclick="switchAuth('signup')">Sign Up</button>
       </div>
 
       <!-- Login Form -->
-      <form id="login-form" class="pro-form" onsubmit="handleAuth(event)">
+      <form id="login-form" onsubmit="handleLogin(event)">
         <div class="form-group">
-          <label>USERNAME / PHONE</label>
-          <input type="text" placeholder="Enter username or 03XX..." required>
+          <label>Username</label>
+          <input type="text" id="login-username" required>
         </div>
         <div class="form-group">
-          <label>PASSWORD</label>
-          <input type="password" placeholder="••••••••" required>
+          <label>Password</label>
+          <input type="password" id="login-password" required>
         </div>
-        <button type="submit" class="btn-action btn-deposit">LOGIN</button>
+        <button type="submit" class="submit-btn">Login</button>
       </form>
 
-      <!-- Sign Up Form -->
-      <form id="signup-form" class="pro-form" style="display: none;" onsubmit="handleAuth(event)">
+      <!-- Signup Form -->
+      <form id="signup-form" style="display: none;" onsubmit="handleSignup(event)">
         <div class="form-group">
-          <label>USERNAME</label>
-          <input type="text" placeholder="Choose username" required>
+          <label>Username</label>
+          <input type="text" id="signup-username" required>
         </div>
         <div class="form-group">
-          <label>PHONE NUMBER</label>
-          <input type="text" placeholder="03XXXXXXXXX" required>
+          <label>Mobile Phone</label>
+          <input type="text" id="signup-phone" required>
         </div>
         <div class="form-group">
-          <label>PASSWORD</label>
-          <input type="password" placeholder="Create password" required>
+          <label>Password</label>
+          <input type="password" id="signup-password" required>
         </div>
-        <button type="submit" class="btn-action btn-deposit">CREATE ACCOUNT</button>
+        <button type="submit" class="submit-btn">Create Account</button>
       </form>
     </div>
-
-    <!-- Game Screen / Multiplier Area -->
-    <div class="game-viewport">
-      <div class="multiplier-display">
-        <span id="multiplier">1.66</span><small>x</small>
-      </div>
-      <div class="status-badge">FLYING HIGH</div>
-    </div>
-
-    <!-- Quick Bet Section -->
-    <div class="bet-container">
-      <div class="input-wrapper">
-        <span class="currency-tag">PKR</span>
-        <input type="number" id="bet-amount" value="100" step="10">
-      </div>
-      <button class="btn-primary btn-bet">PLACE BET</button>
-    </div>
-
-    <!-- Aviator Management Section -->
-    <div class="management-card">
-      <h3 class="card-title">AVIATOR MANAGEMENT</h3>
-
-      <!-- Deposit / Withdrawal Tabs -->
-      <div class="tab-segment">
-        <button type="button" class="tab-btn active" id="btn-tab-deposit" onclick="switchTab('deposit')">Deposit</button>
-        <button type="button" class="tab-btn" id="btn-tab-withdraw" onclick="switchTab('withdraw')">Withdrawal</button>
-      </div>
-
-      <!-- Deposit Form -->
-      <form id="deposit-form" class="pro-form">
-        <div class="form-group">
-          <label>USER NAME / ID</label>
-          <input type="text" placeholder="e.g. Arshad123" required>
-        </div>
-
-        <div class="form-group">
-          <label>AMOUNT (PKR)</label>
-          <input type="number" placeholder="e.g. 1000" required>
-        </div>
-
-        <div class="form-group">
-          <label>PAYMENT METHOD</label>
-          <div class="select-wrapper">
-            <select>
-              <option value="easypaisa">Easypaisa</option>
-              <option value="jazzcash">JazzCash</option>
-              <option value="bank">Bank Transfer</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>TRANSACTION ID (TID)</label>
-          <input type="text" placeholder="Enter 11-digit TID" required>
-        </div>
-
-        <button type="submit" class="btn-action btn-deposit">SUBMIT DEPOSIT</button>
-      </form>
-
-      <!-- Withdraw Form -->
-      <form id="withdraw-form" class="pro-form" style="display: none;">
-        <div class="form-group">
-          <label>USER NAME / ID</label>
-          <input type="text" placeholder="e.g. Arshad123" required>
-        </div>
-
-        <div class="form-group">
-          <label>WITHDRAW AMOUNT (PKR)</label>
-          <input type="number" placeholder="e.g. 500" required>
-        </div>
-
-        <div class="form-group">
-          <label>ACCOUNT / MOBILE NUMBER</label>
-          <input type="text" placeholder="03XXXXXXXXX" required>
-        </div>
-
-        <button type="submit" class="btn-action btn-withdraw">SUBMIT WITHDRAWAL</button>
-      </form>
-    </div>
-
   </div>
 
   <script src="script.js"></script>
