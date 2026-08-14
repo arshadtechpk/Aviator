@@ -1,0 +1,247 @@
+:root {
+  --bg-color: #0b0e14;
+  --card-bg: #151a23;
+  --input-bg: #0d1117;
+  --accent-green: #00e676;
+  --accent-green-glow: rgba(0, 230, 118, 0.25);
+  --accent-red: #ff3366;
+  --text-main: #ffffff;
+  --text-muted: #6e7681;
+  --border-color: #21262d;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 15px;
+}
+
+.app-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--accent-red);
+}
+
+.brand small {
+  font-size: 0.65rem;
+  background: rgba(255, 51, 102, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.wallet-badge {
+  background: rgba(0, 230, 118, 0.08);
+  border: 1px solid var(--accent-green);
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--accent-green);
+  box-shadow: 0 0 12px var(--accent-green-glow);
+}
+
+.currency-label {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-right: 4px;
+}
+
+.game-viewport {
+  position: relative;
+  background: radial-gradient(circle at center, #1c2333 0%, #0b0e14 100%);
+  height: 180px;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.multiplier-display {
+  font-size: 3.5rem;
+  font-weight: 800;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.multiplier-display small {
+  font-size: 2rem;
+}
+
+.status-badge {
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  color: var(--accent-green);
+  background: rgba(0, 230, 118, 0.1);
+  padding: 3px 10px;
+  border-radius: 12px;
+  margin-top: 5px;
+}
+
+.bet-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.currency-tag {
+  position: absolute;
+  left: 12px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.input-wrapper input {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 12px 12px 12px 45px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  outline: none;
+}
+
+.btn-primary {
+  background: var(--accent-green);
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px var(--accent-green-glow);
+}
+
+.management-card {
+  background: rgba(13, 17, 23, 0.5);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 15px;
+}
+
+.card-title {
+  text-align: center;
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+  color: var(--accent-green);
+  margin-bottom: 12px;
+}
+
+.tab-segment {
+  display: flex;
+  background: var(--input-bg);
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.tab-btn.active {
+  background: var(--accent-green);
+  color: #000;
+}
+
+.pro-form .form-group {
+  margin-bottom: 12px;
+}
+
+.pro-form label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+  letter-spacing: 0.5px;
+}
+
+.pro-form input, .pro-form select {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #fff;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.pro-form input:focus, .pro-form select:focus {
+  border-color: var(--accent-green);
+}
+
+.btn-action {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  margin-top: 8px;
+  cursor: pointer;
+}
+
+.btn-deposit {
+  background: var(--accent-green);
+  color: #000;
+}
+
+.btn-withdraw {
+  background: var(--accent-red);
+  color: #fff;
+  }
