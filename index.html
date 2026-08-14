@@ -3,125 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aviator Pro Dashboard</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <title>Aviator Pro</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background: #0f172a; color: white; padding: 20px; text-align: center; }
+    .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #1e293b; border-radius: 8px; margin-bottom: 20px; }
+    .btn { background: #22c55e; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    .btn-alt { background: #3b82f6; }
+    .card { background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: left; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+    .tab-btn { flex: 1; padding: 10px; background: #334155; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    .tab-btn.active { background: #22c55e; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; margin-bottom: 5px; font-size: 14px; }
+    .form-group input, .form-group select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #475569; background: #0f172a; color: white; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
+    .modal-content { background: #1e293b; padding: 25px; border-radius: 8px; width: 90%; max-width: 400px; position: relative; }
+    .close-btn { position: absolute; top: 10px; right: 15px; font-size: 20px; cursor: pointer; color: #94a3b8; }
+  </style>
 </head>
 <body>
 
-  <!-- Top Navigation Header -->
-  <header class="top-nav">
-    <div class="logo">
-      <span class="logo-icon">🚀</span>
-      <span class="logo-text">AVIATOR<span class="highlight">PRO</span></span>
+  <!-- Top Header -->
+  <div class="header">
+    <h2>🚀 AVIATOR PRO</h2>
+    <div id="auth-section">
+      <button class="btn" id="login-btn">Login / Register</button>
+    </div>
+    <div id="user-section" style="display: none;">
+      <span style="color:#22c55e; font-weight:bold;">PKR <span id="balance">0.00</span></span>
+    </div>
+  </div>
+
+  <!-- Wallet Section (Tabs) -->
+  <div class="card">
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-dep-btn">Deposit</button>
+      <button class="tab-btn" id="tab-wit-btn">Withdraw</button>
     </div>
 
-    <div class="user-actions">
-      <button class="auth-btn" id="auth-btn" onclick="openAuthModal()">Login / Register</button>
-      <div class="wallet-badge" id="wallet-badge" style="display: none;">
-        <span class="currency">PKR</span>
-        <span class="balance" id="balance">0.00</span>
+    <!-- Deposit Form -->
+    <form id="deposit-form">
+      <h3>Deposit Funds</h3>
+      <br>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="dep-username" placeholder="Enter username" required>
       </div>
-    </div>
-  </header>
-
-  <!-- Main Game Container -->
-  <main class="dashboard-container">
-    <section class="game-section">
-      <div class="game-card">
-        <div class="game-header">
-          <h2>LIVE MULTIPLIER</h2>
-          <span class="live-indicator">● LIVE</span>
-        </div>
-        
-        <div class="multiplier-display">
-          <div class="multiplier-value" id="multiplier">1.00x</div>
-          <div class="plane-icon" id="plane">✈️</div>
-        </div>
-
-        <div class="betting-controls">
-          <div class="input-group">
-            <label for="bet-amount">Bet Amount (PKR)</label>
-            <input type="number" id="bet-amount" value="100" min="10">
-          </div>
-          <button class="bet-btn" id="bet-btn" onclick="placeBet()">PLACE BET</button>
-        </div>
+      <div class="form-group">
+        <label>Payment Method</label>
+        <select id="dep-method">
+          <option value="easypaisa">EasyPaisa</option>
+          <option value="jazzcash">JazzCash</option>
+        </select>
       </div>
-    </section>
-
-    <!-- Deposit Panel -->
-    <section class="wallet-section">
-      <div class="wallet-card">
-        <div class="wallet-tabs">
-          <button class="tab-btn active" id="btn-tab-deposit" onclick="switchTab('deposit')">Deposit</button>
-          <button class="tab-btn" id="btn-tab-withdraw" onclick="switchTab('withdraw')">Withdraw</button>
-        </div>
-
-        <form id="deposit-form" class="wallet-form" onsubmit="handleDepositSubmit(event)">
-          <h3>Deposit Funds</h3>
-          <p class="instruction">Send money via EasyPaisa / JazzCash & enter Transaction ID (TID) below.</p>
-          
-          <div class="form-group">
-            <label>Username</label>
-            <input type="text" id="dep-username" placeholder="Enter your username" required>
-          </div>
-
-          <div class="form-group">
-            <label>Payment Method</label>
-            <select id="dep-method">
-              <option value="easypaisa">EasyPaisa</option>
-              <option value="jazzcash">JazzCash</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Amount (PKR)</label>
-            <input type="number" id="dep-amount" placeholder="Min 100 PKR" min="100" required>
-          </div>
-
-          <div class="form-group">
-            <label>Transaction ID (TID)</label>
-            <input type="text" id="dep-tid" placeholder="Enter 11 or 12 digit TID" required>
-          </div>
-
-          <button type="submit" class="submit-btn">Submit Deposit Request</button>
-        </form>
-
-        <form id="withdraw-form" class="wallet-form" style="display: none;" onsubmit="handleWithdrawSubmit(event)">
-          <h3>Withdraw Funds</h3>
-          <div class="form-group">
-            <label>Payment Method</label>
-            <select id="wit-method">
-              <option value="easypaisa">EasyPaisa</option>
-              <option value="jazzcash">JazzCash</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Account Mobile Number</label>
-            <input type="text" id="wit-account" placeholder="03XXXXXXXXX" required>
-          </div>
-          <div class="form-group">
-            <label>Amount (PKR)</label>
-            <input type="number" id="wit-amount" placeholder="Min 500 PKR" min="500" required>
-          </div>
-          <button type="submit" class="submit-btn withdraw-bg">Request Withdrawal</button>
-        </form>
+      <div class="form-group">
+        <label>Amount (PKR)</label>
+        <input type="number" id="dep-amount" placeholder="Min 100" required>
       </div>
-    </section>
-  </main>
+      <div class="form-group">
+        <label>Transaction ID (TID)</label>
+        <input type="text" id="dep-tid" placeholder="TID Number" required>
+      </div>
+      <button type="submit" class="btn" style="width:100%;">Submit Deposit</button>
+    </form>
 
-  <!-- Login / Signup Modal -->
-  <div class="modal-overlay" id="auth-modal" style="display: none;">
-    <div class="modal-card">
-      <button class="close-btn" onclick="closeAuthModal()">✕</button>
+    <!-- Withdraw Form -->
+    <form id="withdraw-form" style="display: none;">
+      <h3>Withdraw Funds</h3>
+      <br>
+      <div class="form-group">
+        <label>Account Number</label>
+        <input type="text" placeholder="03XXXXXXXXX" required>
+      </div>
+      <div class="form-group">
+        <label>Amount (PKR)</label>
+        <input type="number" placeholder="Min 500" required>
+      </div>
+      <button type="submit" class="btn btn-alt" style="width:100%;">Request Withdraw</button>
+    </form>
+  </div>
+
+  <!-- Auth Modal (Popup) -->
+  <div class="modal" id="auth-modal">
+    <div class="modal-content">
+      <span class="close-btn" id="close-modal">&times;</span>
       
-      <div class="modal-tabs">
-        <button class="modal-tab active" id="tab-login" onclick="switchAuth('login')">Login</button>
-        <button class="modal-tab" id="tab-signup" onclick="switchAuth('signup')">Sign Up</button>
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-login-btn">Login</button>
+        <button class="tab-btn" id="tab-signup-btn">Sign Up</button>
       </div>
 
       <!-- Login Form -->
-      <form id="login-form" onsubmit="handleLogin(event)">
+      <form id="login-form">
         <div class="form-group">
           <label>Username</label>
           <input type="text" id="login-username" required>
@@ -130,24 +104,24 @@
           <label>Password</label>
           <input type="password" id="login-password" required>
         </div>
-        <button type="submit" class="submit-btn">Login</button>
+        <button type="submit" class="btn" style="width:100%;">Login</button>
       </form>
 
       <!-- Signup Form -->
-      <form id="signup-form" style="display: none;" onsubmit="handleSignup(event)">
+      <form id="signup-form" style="display: none;">
         <div class="form-group">
           <label>Username</label>
           <input type="text" id="signup-username" required>
         </div>
         <div class="form-group">
-          <label>Mobile Phone</label>
+          <label>Mobile Number</label>
           <input type="text" id="signup-phone" required>
         </div>
         <div class="form-group">
           <label>Password</label>
           <input type="password" id="signup-password" required>
         </div>
-        <button type="submit" class="submit-btn">Create Account</button>
+        <button type="submit" class="btn btn-alt" style="width:100%;">Create Account</button>
       </form>
     </div>
   </div>
