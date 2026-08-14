@@ -1,252 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aviator Game & Portal</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #0b0e14; color: #fff; padding: 12px; display: flex; justify-content: center; }
-        .main-container { width: 100%; max-width: 450px; background: #151a23; border-radius: 12px; padding: 16px; border: 1px solid #242b35; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
-        
-        /* Top Navigation Header */
-        .header { display: flex; justify-content: space-between; align-items: center; background: #1e2530; padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; }
-        .logo { font-size: 18px; font-weight: bold; color: #ff1744; letter-spacing: 1px; }
-        .balance-box { font-size: 15px; font-weight: bold; color: #00e676; background: #0b0e14; padding: 6px 12px; border-radius: 20px; border: 1px solid #242b35; }
-        
-        /* Game Screen Canvas */
-        .game-screen { position: relative; width: 100%; height: 210px; background: radial-gradient(circle, #1a2230 0%, #0b0e14 100%); border-radius: 10px; border: 1px solid #242b35; overflow: hidden; display: flex; justify-content: center; align-items: center; margin-bottom: 15px; }
-        .multiplier { font-size: 44px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
-        .plane { position: absolute; bottom: 20px; left: 20px; font-size: 36px; transition: transform 0.1s linear; display: none; z-index: 1; }
-        .crashed-text { color: #ff1744; font-size: 22px; font-weight: bold; position: absolute; bottom: 30px; display: none; }
-        
-        /* Betting Section */
-        .bet-section { display: flex; gap: 10px; margin-bottom: 20px; }
-        .bet-input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #242b35; background: #0b0e14; color: #fff; font-size: 16px; text-align: center; font-weight: bold; }
-        .action-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
-        .btn-bet { background: #00e676; color: #000; }
-        .btn-cashout { background: #ffb300; color: #000; display: none; }
-
-        /* Banking / Management Section */
-        .portal-title { text-align: center; color: #00e676; font-size: 18px; margin-bottom: 12px; font-weight: bold; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 15px; border-top: 1px solid #242b35; padding-top: 15px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 6px; background: #1e2530; color: #90a4ae; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .tab-btn.active-dep { background: #00e676; color: #000; }
-        .tab-btn.active-with { background: #ff1744; color: #fff; }
-        
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 12px; color: #90a4ae; margin-bottom: 5px; }
-        .form-group input, .form-group select { width: 100%; padding: 11px; border-radius: 6px; border: 1px solid #242b35; background: #0b0e14; color: #fff; font-size: 14px; }
-        
-        .submit-btn { width: 100%; padding: 13px; border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 5px; }
-        #status-msg { text-align: center; font-size: 13px; margin-top: 10px; font-weight: bold; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aviator Pro Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<div class="main-container">
-    <!-- Header -->
-    <div class="header">
-        <div class="logo">✈️ AVIATOR</div>
-        <div class="balance-box">Bal: <span id="user-balance">1000</span> PKR</div>
+  <div class="app-card">
+    
+    <!-- Header Section -->
+    <header class="navbar">
+      <div class="brand">
+        <span class="plane-icon">✈️</span>
+        <span class="logo-text">AVIATOR <small>PRO</small></span>
+      </div>
+      <div class="wallet-badge">
+        <span class="currency-label">PKR</span>
+        <span class="balance" id="balance">1,066.00</span>
+      </div>
+    </header>
+
+    <!-- Game Screen / Multiplier Area -->
+    <div class="game-viewport">
+      <div class="multiplier-display">
+        <span id="multiplier">1.66</span><small>x</small>
+      </div>
+      <div class="status-badge">FLYING HIGH</div>
     </div>
 
-    <!-- Game Screen -->
-    <div class="game-screen">
-        <div class="multiplier" id="multiplier">1.00x</div>
-        <div class="plane" id="plane">🚀</div>
-        <div class="crashed-text" id="crashed-text">FLEW AWAY!</div>
+    <!-- Quick Bet Section -->
+    <div class="bet-container">
+      <div class="input-wrapper">
+        <span class="currency-tag">PKR</span>
+        <input type="number" id="bet-amount" value="100" step="10">
+      </div>
+      <button class="btn-primary btn-bet">PLACE BET</button>
     </div>
 
-    <!-- Bet Controls -->
-    <div class="bet-section">
-        <input type="number" id="bet-amount" class="bet-input" value="100" min="10">
-        <button id="bet-btn" class="action-btn btn-bet" onclick="placeBet()">BET</button>
-        <button id="cashout-btn" class="action-btn btn-cashout" onclick="cashOut()">CASHOUT</button>
-    </div>
+    <!-- Aviator Management Section -->
+    <div class="management-card">
+      <h3 class="card-title">AVIATOR MANAGEMENT</h3>
 
-    <!-- Management / Banking Portal -->
-    <div class="portal-title">Aviator Management</div>
+      <!-- Deposit / Withdrawal Tabs -->
+      <div class="tab-segment">
+        <button type="button" class="tab-btn active" id="btn-tab-deposit" onclick="switchTab('deposit')">Deposit</button>
+        <button type="button" class="tab-btn" id="btn-tab-withdraw" onclick="switchTab('withdraw')">Withdrawal</button>
+      </div>
 
-    <div class="tabs">
-        <button class="tab-btn active-dep" id="dep-tab" onclick="switchTab('deposit')">Deposit</button>
-        <button class="tab-btn" id="with-tab" onclick="switchTab('withdraw')">Withdrawal</button>
-    </div>
-
-    <form id="bank-form" onsubmit="handleBankSubmit(event)">
+      <!-- Deposit Form -->
+      <form id="deposit-form" class="pro-form">
         <div class="form-group">
-            <label>User Name / ID</label>
-            <input type="text" id="bank-user" placeholder="e.g. Arshad123" required>
+          <label>USER NAME / ID</label>
+          <input type="text" placeholder="e.g. Arshad123" required>
         </div>
+
         <div class="form-group">
-            <label>Amount (PKR)</label>
-            <input type="number" id="bank-amount" placeholder="e.g. 1000" required>
+          <label>AMOUNT (PKR)</label>
+          <input type="number" placeholder="e.g. 1000" required>
         </div>
+
         <div class="form-group">
-            <label>Payment Method</label>
-            <select id="bank-method">
-                <option value="Easypaisa">Easypaisa</option>
-                <option value="JazzCash">JazzCash</option>
-                <option value="Bank">Bank Transfer</option>
+          <label>PAYMENT METHOD</label>
+          <div class="select-wrapper">
+            <select>
+              <option value="easypaisa">Easypaisa</option>
+              <option value="jazzcash">JazzCash</option>
+              <option value="bank">Bank Transfer</option>
             </select>
+          </div>
         </div>
+
         <div class="form-group">
-            <label id="tid-label">Transaction ID (TID)</label>
-            <input type="text" id="bank-tid" placeholder="Enter TID" required>
+          <label>TRANSACTION ID (TID)</label>
+          <input type="text" placeholder="Enter 11-digit TID" required>
         </div>
-        <div class="form-group" id="title-group">
-            <label>Account Title</label>
-            <input type="text" id="bank-title" placeholder="Account Title Name">
+
+        <button type="submit" class="btn-action btn-deposit">SUBMIT DEPOSIT</button>
+      </form>
+
+      <!-- Withdraw Form (Initially Hidden) -->
+      <form id="withdraw-form" class="pro-form" style="display: none;">
+        <div class="form-group">
+          <label>USER NAME / ID</label>
+          <input type="text" placeholder="e.g. Arshad123" required>
         </div>
-        <button type="submit" id="form-submit-btn" class="submit-btn" style="background:#00e676; color:#000;">Submit Deposit</button>
-    </form>
 
-    <div id="status-msg"></div>
-</div>
+        <div class="form-group">
+          <label>WITHDRAW AMOUNT (PKR)</label>
+          <input type="number" placeholder="e.g. 500" required>
+        </div>
 
-<script>
-    // Configured Google Sheet Web App URL
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBmbTqpAhf90v6lK4MhGEmkuEjhWimRyzPI7s_gxoGwHnNuAIUaKGTdjaYLMez8bKhJA/exec";
+        <div class="form-group">
+          <label>ACCOUNT / MOBILE NUMBER</label>
+          <input type="text" placeholder="03XXXXXXXXX" required>
+        </div>
 
-    // --- GAME LOGIC ---
-    let balance = 1000;
-    let currentMultiplier = 1.00;
-    let gameInterval;
-    let isPlaying = false;
-    let betAmount = 0;
-    let crashPoint = 0;
+        <button type="submit" class="btn-action btn-withdraw">SUBMIT WITHDRAWAL</button>
+      </form>
+    </div>
 
-    function updateBalanceDisplay() {
-        document.getElementById('user-balance').innerText = balance.toFixed(2);
-    }
+  </div>
 
-    function placeBet() {
-        let inputVal = parseFloat(document.getElementById('bet-amount').value);
-        if (isNaN(inputVal) || inputVal > balance || inputVal <= 0) {
-            alert('Invalid or Insufficient Balance!');
-            return;
-        }
-
-        betAmount = inputVal;
-        balance -= betAmount;
-        updateBalanceDisplay();
-
-        isPlaying = true;
-        document.getElementById('bet-btn').style.display = 'none';
-        document.getElementById('cashout-btn').style.display = 'block';
-        document.getElementById('crashed-text').style.display = 'none';
-
-        startFly();
-    }
-
-    function startFly() {
-        currentMultiplier = 1.00;
-        crashPoint = (Math.random() * 4 + 1.1).toFixed(2);
-        
-        const plane = document.getElementById('plane');
-        const multDisplay = document.getElementById('multiplier');
-        plane.style.display = 'block';
-
-        let posX = 20, posY = 20;
-
-        gameInterval = setInterval(() => {
-            currentMultiplier += 0.03;
-            multDisplay.innerText = currentMultiplier.toFixed(2) + 'x';
-
-            posX += 2;
-            posY += 1.2;
-            plane.style.transform = `translate(${posX}px, -${posY}px)`;
-
-            if (currentMultiplier >= crashPoint) {
-                gameOver(false);
-            }
-        }, 100);
-    }
-
-    function cashOut() {
-        if (!isPlaying) return;
-        let winAmount = betAmount * currentMultiplier;
-        balance += winAmount;
-        updateBalanceDisplay();
-        alert(`You Cashed Out at ${currentMultiplier.toFixed(2)}x! Won: ${winAmount.toFixed(2)} PKR`);
-        gameOver(true);
-    }
-
-    function gameOver(isWin) {
-        clearInterval(gameInterval);
-        isPlaying = false;
-
-        document.getElementById('plane').style.display = 'none';
-        document.getElementById('plane').style.transform = 'translate(0px, 0px)';
-        document.getElementById('cashout-btn').style.display = 'none';
-        document.getElementById('bet-btn').style.display = 'block';
-
-        if (!isWin) {
-            document.getElementById('crashed-text').style.display = 'block';
-            document.getElementById('multiplier').innerText = '1.00x';
-        }
-    }
-
-    // --- MANAGEMENT / BANKING LOGIC ---
-    let currentBankType = 'deposit';
-
-    function switchTab(type) {
-        currentBankType = type;
-        const depTab = document.getElementById('dep-tab');
-        const withTab = document.getElementById('with-tab');
-        const submitBtn = document.getElementById('form-submit-btn');
-        const tidLabel = document.getElementById('tid-label');
-
-        if (type === 'deposit') {
-            depTab.className = 'tab-btn active-dep';
-            withTab.className = 'tab-btn';
-            submitBtn.style.background = '#00e676';
-            submitBtn.style.color = '#000';
-            submitBtn.innerText = 'Submit Deposit';
-            tidLabel.innerText = 'Transaction ID (TID)';
-        } else {
-            withTab.className = 'tab-btn active-with';
-            depTab.className = 'tab-btn';
-            submitBtn.style.background = '#ff1744';
-            submitBtn.style.color = '#fff';
-            submitBtn.innerText = 'Submit Withdrawal';
-            tidLabel.innerText = 'Withdraw Account Number';
-        }
-    }
-
-    async function handleBankSubmit(event) {
-        event.preventDefault();
-        const statusMsg = document.getElementById('status-msg');
-        statusMsg.style.color = '#ffb300';
-        statusMsg.innerText = 'Saving to Google Sheet...';
-
-        const payload = {
-            type: currentBankType.toUpperCase(),
-            user: document.getElementById('bank-user').value,
-            amount: document.getElementById('bank-amount').value,
-            method: document.getElementById('bank-method').value,
-            accountOrTid: document.getElementById('bank-tid').value,
-            title: document.getElementById('bank-title').value
-        };
-
-        try {
-            await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            statusMsg.style.color = '#00e676';
-            statusMsg.innerText = 'Data Successfully Saved to Google Sheet!';
-            document.getElementById('bank-form').reset();
-            switchTab(currentBankType);
-        } catch (err) {
-            statusMsg.style.color = '#ff1744';
-            statusMsg.innerText = 'Error saving data. Please check connection.';
-        }
-    }
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
