@@ -6,8 +6,6 @@
   <title>Aviator Pro Dashboard</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <!-- Supabase Database Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -124,7 +122,7 @@
 
   </main>
 
-  <!-- Login / Signup Modal -->
+  <!-- Login / Signup Modal Popup -->
   <div class="modal-overlay" id="auth-modal" style="display: none;">
     <div class="modal-card">
       <button class="close-btn" onclick="closeAuthModal()">✕</button>
@@ -166,6 +164,8 @@
     </div>
   </div>
 
+  <!-- Supabase Library & Custom Script Loaded at bottom -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
 </body>
 </html>
