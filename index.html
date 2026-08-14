@@ -92,26 +92,36 @@ button:disabled{opacity:.3;cursor:not-allowed}
   💬 Live Support
 </div>
 
-<!-- Auth Modal (Register / Login) -->
+<!-- Auth Modal (Register / Login / Reset) -->
 <div class="modal" id="authModal">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal('authModal')">&times;</span>
     <h3 class="modal-title" id="authTitle">Register Account</h3>
+    
     <div class="form-group">
       <label>Mobile Number</label>
       <input type="text" id="usernameInput" placeholder="03001234567">
     </div>
-    <div class="form-group">
-      <label>Password</label>
+    
+    <div class="form-group" id="passFieldGroup">
+      <label id="passLabel">Password</label>
       <input type="password" id="passwordInput" placeholder="******">
     </div>
+    
     <div class="form-group" id="refFieldGroup">
       <label>Referral Code (Friend's Number - Optional)</label>
       <input type="text" id="refCodeInput" placeholder="03092255002">
     </div>
+
+    <!-- Forgot Password Trigger -->
+    <p id="forgotLink" style="display:none; text-align:right; margin:-5px 0 10px; font-size:12px;">
+      <a href="#" onclick="switchAuthMode('forgot')" style="color:#ef4444; text-decoration:none;">Forgot Password?</a>
+    </p>
+
     <button class="btn-submit" id="authSubmitBtn" onclick="handleAuth()">Register & Get 15 Bonus Coins</button>
+
     <p style="text-align:center; margin-top:12px; font-size:12px;">
-      <a href="#" id="authToggleLink" onclick="toggleAuthMode()" style="color:#38bdf8; text-decoration:none;">Already registered? Switch to Login</a>
+      <a href="#" id="authToggleLink" onclick="switchAuthMode(currentMode === 'reg' ? 'login' : 'reg')" style="color:#38bdf8; text-decoration:none;">Already registered? Switch to Login</a>
     </p>
   </div>
 </div>
@@ -202,7 +212,7 @@ const betBtn=document.getElementById('betBtn'),cashBtn=document.getElementById('
 let balance=10000, bet=10, running=false, crashed=false, cashed=false, m=1, crashAt=0, start=0, raf;
 let isRealUser = false;
 let currentUser = null;
-let isRegisterMode = true;
+let currentMode = 'reg'; // 'reg', 'login', 'forgot'
 
 function resize(){canvas.width=canvas.clientWidth*devicePixelRatio;canvas.height=canvas.clientHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
 addEventListener('resize',resize); resize();
@@ -252,9 +262,9 @@ function newRound(){
  running=true;crashed=false;cashed=false;m=1;start=performance.now();
  
  if (!isRealUser) {
-   crashAt = 10.0 + Math.random() * 40.0; // High multipliers on demo mode
+   crashAt = 10.0 + Math.random() * 40.0;
  } else {
-   crashAt = 1.05 + Math.random() * 4.5; // Realistic fair crash on real mode
+   crashAt = 1.05 + Math.random() * 4.5;
  }
 
  statusEl.textContent='Flying...';statusEl.style.color='#aab4c8';
@@ -302,23 +312,36 @@ function addHistory(x){
 function openModal(id){document.getElementById(id).style.display='flex'}
 function closeModal(id){document.getElementById(id).style.display='none'}
 
-function toggleAuthMode(){
-  isRegisterMode = !isRegisterMode;
+function switchAuthMode(mode){
+  currentMode = mode;
   const title = document.getElementById('authTitle');
   const btn = document.getElementById('authSubmitBtn');
   const link = document.getElementById('authToggleLink');
   const refGrp = document.getElementById('refFieldGroup');
+  const forgotLink = document.getElementById('forgotLink');
+  const passLabel = document.getElementById('passLabel');
 
-  if(isRegisterMode){
+  if(mode === 'reg'){
     title.innerText = 'Register Account';
     btn.innerText = 'Register & Get 15 Bonus Coins';
     link.innerText = 'Already registered? Switch to Login';
     refGrp.style.display = 'block';
-  } else {
+    forgotLink.style.display = 'none';
+    passLabel.innerText = 'Password';
+  } else if(mode === 'login'){
     title.innerText = 'Login Account';
     btn.innerText = 'Login to Real Account';
     link.innerText = "Don't have an account? Register Now";
     refGrp.style.display = 'none';
+    forgotLink.style.display = 'block';
+    passLabel.innerText = 'Password';
+  } else if(mode === 'forgot'){
+    title.innerText = 'Reset Password';
+    btn.innerText = 'Update New Password';
+    link.innerText = 'Back to Login';
+    refGrp.style.display = 'none';
+    forgotLink.style.display = 'none';
+    passLabel.innerText = 'Enter New Password';
   }
 }
 
@@ -329,10 +352,10 @@ function handleAuth(){
 
   if(!user || !pass){ alert('Please fill in Mobile Number and Password.'); return; }
 
-  if(isRegisterMode){
+  if(currentMode === 'reg'){
     if(localStorage.getItem(user)){
       alert('This mobile number is already registered! Switch to Login.');
-      toggleAuthMode();
+      switchAuthMode('login');
     } else {
       const userData = { password: pass, realBalance: 15, referrer: refCode || null, hasDeposited: false };
       localStorage.setItem(user, JSON.stringify(userData));
@@ -347,10 +370,10 @@ function handleAuth(){
       update();
       closeModal('authModal');
     }
-  } else {
+  } else if(currentMode === 'login'){
     const saved = localStorage.getItem(user);
     if(!saved){
-      alert('No account found! Please Register first.');
+      alert('No account found with this number! Please Register first.');
       return;
     }
     const userData = JSON.parse(saved);
@@ -367,6 +390,17 @@ function handleAuth(){
     } else {
       alert('❌ Incorrect Password!');
     }
+  } else if(currentMode === 'forgot'){
+    const saved = localStorage.getItem(user);
+    if(!saved){
+      alert('No account found with this number! Please check your mobile number.');
+      return;
+    }
+    let userData = JSON.parse(saved);
+    userData.password = pass;
+    localStorage.setItem(user, JSON.stringify(userData));
+    alert('✅ Password Reset Successful! Now you can Login with your new password.');
+    switchAuthMode('login');
   }
 }
 
@@ -393,7 +427,6 @@ function processDeposit(){
  if(isRealUser && currentUser){
    let userData = JSON.parse(localStorage.getItem(currentUser));
    
-   // Referral Bonus Check
    if(amt >= 1000 && !userData.hasDeposited){
      balance += 20;
      userData.hasDeposited = true;
